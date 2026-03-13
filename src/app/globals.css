@@ -1,0 +1,642 @@
+@import "tailwindcss";
+
+/* ==========================================================================
+   VEIL DESIGN SYSTEM
+   Dark, minimal, engineering/blueprint aesthetic.
+   oklch-based gray ramp. No border radius. 1px borders as primary element.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. COLOR TOKENS
+   -------------------------------------------------------------------------- */
+
+:root {
+  /* Gray ramp (oklch, achromatic) */
+  --c1: oklch(0.162 0 0);
+  --c2: oklch(0.195 0 0);
+  --c3: oklch(0.254 0 0);
+  --c4: oklch(0.302 0 0);
+  --c5: oklch(0.348 0 0);
+  --c6: oklch(0.396 0 0);
+  --c7: oklch(0.459 0 0);
+  --c8: oklch(0.549 0 0);
+  --c9: oklch(0.649 0 0);
+  --c10: oklch(0.72 0 0);
+  --c11: oklch(0.863 0 0);
+  --c12: oklch(0.933 0 0);
+
+  /* Semantic */
+  --background: var(--c1);
+  --foreground: var(--c12);
+  --card: var(--c2);
+  --card-elevated: var(--c3);
+  --border: var(--c3);
+  --border-hover: var(--c4);
+  --accent: #3b82f6;
+  --accent-hover: #2563eb;
+  --success: #22c55e;
+  --warning: #eab308;
+  --error: #ef4444;
+  --muted: var(--c7);
+}
+
+/* --------------------------------------------------------------------------
+   2. TAILWIND v4 THEME (CSS-first config)
+   -------------------------------------------------------------------------- */
+
+@theme inline {
+  /* Gray scale utilities: bg-c1, text-c5, border-c3, etc. */
+  --color-c1: var(--c1);
+  --color-c2: var(--c2);
+  --color-c3: var(--c3);
+  --color-c4: var(--c4);
+  --color-c5: var(--c5);
+  --color-c6: var(--c6);
+  --color-c7: var(--c7);
+  --color-c8: var(--c8);
+  --color-c9: var(--c9);
+  --color-c10: var(--c10);
+  --color-c11: var(--c11);
+  --color-c12: var(--c12);
+
+  /* Semantic utilities */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-elevated: var(--card-elevated);
+  --color-border: var(--border);
+  --color-border-hover: var(--border-hover);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-error: var(--error);
+  --color-muted: var(--muted);
+
+  /* Font families -- mapped from CSS variables set on <html> by next/font */
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --font-pixel: var(--font-geist-pixel-square);
+
+  /* Kill default border radius */
+  --radius-sm: 0px;
+  --radius-md: 0px;
+  --radius-lg: 0px;
+  --radius-xl: 0px;
+  --radius-2xl: 0px;
+  --radius-3xl: 0px;
+  --radius-4xl: 0px;
+  --radius-full: 0px;
+
+  /* Animation tokens */
+  --animate-flow-pulse: flow-pulse 3s ease-in-out infinite;
+  --animate-flow-pulse-v: flow-pulse-v 3s ease-in-out infinite;
+  --animate-icon-morph: icon-morph 2.4s ease-in-out infinite;
+  --animate-eye-blink: eye-blink 4s ease-in-out infinite;
+  --animate-skeleton-pulse: skeleton-pulse 1.8s ease-in-out infinite;
+  --animate-stack-reveal: stack-reveal 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* --------------------------------------------------------------------------
+   3. BASE RESETS
+   -------------------------------------------------------------------------- */
+
+*,
+*::before,
+*::after {
+  border-color: var(--border);
+}
+
+html {
+  color-scheme: dark;
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Selection -- blue accent */
+::selection {
+  background: var(--accent);
+  color: white;
+}
+
+::-moz-selection {
+  background: var(--accent);
+  color: white;
+}
+
+/* Scrollbar (thin, dark) */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--c1);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--c4);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--c5);
+}
+
+/* Firefox scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--c4) var(--c1);
+}
+
+/* --------------------------------------------------------------------------
+   4. TYPOGRAPHY
+   -------------------------------------------------------------------------- */
+
+/* Pixel font for display headings */
+h1,
+h2 {
+  font-family: var(--font-geist-pixel-square), var(--font-geist-mono), monospace;
+  color: var(--c11);
+  letter-spacing: -0.02em;
+}
+
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  color: var(--c11);
+}
+
+/* Label style -- 10px mono uppercase, used extensively in blueprint aesthetic */
+.label {
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 10px;
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--c5);
+}
+
+/* --------------------------------------------------------------------------
+   5. KEYFRAME ANIMATIONS
+   -------------------------------------------------------------------------- */
+
+/* 5a. Flow Pulse -- horizontal comet trail */
+@keyframes flow-pulse {
+  0% {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(calc(var(--flow-width, 100vw)));
+    opacity: 0;
+  }
+}
+
+/* 5b. Flow Pulse -- vertical comet trail */
+@keyframes flow-pulse-v {
+  0% {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(calc(var(--flow-height, 100vh)));
+    opacity: 0;
+  }
+}
+
+/* 5c. Icon Morph -- SVG stroke draw in / hold / draw out */
+@keyframes icon-morph {
+  0% {
+    stroke-dashoffset: 100;
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  40% {
+    stroke-dashoffset: 0;
+  }
+  60% {
+    stroke-dashoffset: 0;
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    stroke-dashoffset: -100;
+    opacity: 0;
+  }
+}
+
+/* 5d. Eye Blink -- scaleY squeeze */
+@keyframes eye-blink {
+  0%,
+  90%,
+  100% {
+    transform: scaleY(1);
+  }
+  95% {
+    transform: scaleY(0.1);
+  }
+}
+
+/* 5e. Skeleton Pulse -- opacity oscillation */
+@keyframes skeleton-pulse {
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* 5f. Typing Dot -- chat indicator bounce */
+@keyframes typing-dot {
+  0%,
+  60%,
+  100% {
+    opacity: 0.2;
+    transform: translateY(0);
+  }
+  30% {
+    opacity: 1;
+    transform: translateY(-3px);
+  }
+}
+
+/* 5g. Stack Layer Reveal -- translateY + fade */
+@keyframes stack-reveal {
+  from {
+    transform: translateY(16px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   6. ANIMATION UTILITY CLASSES
+   -------------------------------------------------------------------------- */
+
+/* Flow line -- horizontal (top border with comet trail) */
+.flow-line {
+  position: relative;
+  overflow: hidden;
+}
+
+.flow-line::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 70px;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--c8),
+    transparent
+  );
+  animation: flow-pulse 3s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* Flow line -- vertical (left border with comet trail) */
+.flow-line-v {
+  position: relative;
+}
+
+.flow-line-v::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: 70px;
+  background: linear-gradient(
+    180deg,
+    transparent,
+    var(--c8),
+    transparent
+  );
+  animation: flow-pulse-v 3s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* Icon morph -- apply to SVG elements */
+.icon-morph {
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+  animation: icon-morph 2.4s ease-in-out infinite;
+}
+
+/* Eye blink */
+.eye-blink {
+  animation: eye-blink 4s ease-in-out infinite;
+  transform-origin: center;
+}
+
+/* Skeleton pulse */
+.skeleton {
+  animation: skeleton-pulse 1.8s ease-in-out infinite;
+}
+
+/* Stack reveal -- triggered by adding .is-visible (via IntersectionObserver) */
+.stack-layer {
+  opacity: 0;
+  transform: translateY(16px);
+}
+
+.stack-layer.is-visible {
+  animation: stack-reveal 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Staggered children */
+.stack-layer.is-visible:nth-child(1) { animation-delay: 0ms; }
+.stack-layer.is-visible:nth-child(2) { animation-delay: 60ms; }
+.stack-layer.is-visible:nth-child(3) { animation-delay: 120ms; }
+.stack-layer.is-visible:nth-child(4) { animation-delay: 180ms; }
+.stack-layer.is-visible:nth-child(5) { animation-delay: 240ms; }
+.stack-layer.is-visible:nth-child(6) { animation-delay: 300ms; }
+.stack-layer.is-visible:nth-child(7) { animation-delay: 360ms; }
+.stack-layer.is-visible:nth-child(8) { animation-delay: 420ms; }
+
+/* --------------------------------------------------------------------------
+   7. BACKGROUND PATTERNS
+   -------------------------------------------------------------------------- */
+
+/* 7a. Dot grid -- subtle engineering paper */
+.dot-grid {
+  background-image: radial-gradient(
+    circle,
+    var(--c3) 0.5px,
+    transparent 0.5px
+  );
+  background-size: 24px 24px;
+}
+
+/* 7b. Construction grid -- faint blueprint grid lines */
+.construction-grid {
+  background-image:
+    linear-gradient(var(--c3) 1px, transparent 1px),
+    linear-gradient(90deg, var(--c3) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+/* 7c. Construction grid -- fine (12px) */
+.construction-grid-fine {
+  background-image:
+    linear-gradient(var(--c2) 1px, transparent 1px),
+    linear-gradient(90deg, var(--c2) 1px, transparent 1px);
+  background-size: 12px 12px;
+}
+
+/* --------------------------------------------------------------------------
+   8. SECTION HATCH DIVIDER
+   -------------------------------------------------------------------------- */
+
+.hatch-divider {
+  width: 100%;
+  height: 40px;
+  background: repeating-linear-gradient(
+    -45deg,
+    transparent,
+    transparent 4px,
+    var(--c2) 4px,
+    var(--c2) 5px
+  );
+  border-top: 1px solid var(--c3);
+  border-bottom: 1px solid var(--c3);
+}
+
+/* --------------------------------------------------------------------------
+   9. LAYOUT UTILITIES
+   -------------------------------------------------------------------------- */
+
+/* Max-width container */
+.container-narrow {
+  max-width: 960px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+
+/* Section pattern: border-t + flow-line */
+.section {
+  border-top: 1px solid var(--c3);
+  position: relative;
+  overflow: hidden;
+}
+
+.section::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 70px;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--accent),
+    transparent
+  );
+  animation: flow-pulse 3s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* --------------------------------------------------------------------------
+   10. COMPONENT PRIMITIVES
+   -------------------------------------------------------------------------- */
+
+/* Card */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  transition: border-color 150ms ease;
+}
+
+.card:hover {
+  border-color: var(--border-hover);
+}
+
+/* Card elevated */
+.card-elevated {
+  background: var(--card-elevated);
+  border: 1px solid var(--border);
+}
+
+/* Badge */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  padding: 2px 8px;
+  border: 1px solid var(--border);
+  color: var(--c8);
+}
+
+.badge-accent {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.badge-success {
+  border-color: var(--success);
+  color: var(--success);
+}
+
+.badge-warning {
+  border-color: var(--warning);
+  color: var(--warning);
+}
+
+.badge-error {
+  border-color: var(--error);
+  color: var(--error);
+}
+
+/* Button base */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--c10);
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+
+.btn:hover {
+  border-color: var(--border-hover);
+  color: var(--c12);
+}
+
+.btn-accent {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.btn-accent:hover {
+  background: var(--accent);
+  color: white;
+}
+
+.btn-filled {
+  background: var(--c12);
+  color: var(--c1);
+  border-color: var(--c12);
+}
+
+.btn-filled:hover {
+  background: var(--c11);
+  border-color: var(--c11);
+}
+
+/* Input */
+.input {
+  width: 100%;
+  background: var(--c2);
+  border: 1px solid var(--border);
+  padding: 0.5rem 0.75rem;
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 13px;
+  color: var(--c12);
+  outline: none;
+  transition: border-color 150ms ease;
+}
+
+.input::placeholder {
+  color: var(--c5);
+}
+
+.input:focus {
+  border-color: var(--accent);
+}
+
+/* --------------------------------------------------------------------------
+   11. FOCUS & INTERACTION STATES
+   -------------------------------------------------------------------------- */
+
+:focus-visible {
+  outline: 1px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* --------------------------------------------------------------------------
+   12. REDUCED MOTION
+   -------------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .flow-line::after,
+  .flow-line-v::after,
+  .section::after {
+    animation: none;
+    opacity: 0;
+  }
+
+  .icon-morph {
+    animation: none;
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+
+  .eye-blink {
+    animation: none;
+  }
+
+  .skeleton {
+    animation: none;
+    opacity: 0.6;
+  }
+
+  .stack-layer {
+    opacity: 1;
+    transform: none;
+  }
+}
