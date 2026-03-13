@@ -25,6 +25,8 @@ import {
   FileText,
   Globe,
   Lock,
+  Bot,
+  Upload,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import {
@@ -33,6 +35,8 @@ import {
   type StealthMetaAddress,
 } from "@/lib/stealth/generate";
 import { formatAddress } from "@/lib/ens/resolve";
+import { useVeilAgent } from "@/hooks/useVeilAgent";
+import { useStealthRegistry } from "@/hooks/useStealthRegistry";
 
 /* --------------------------------------------------------------------------
    CONSTANTS
@@ -311,6 +315,25 @@ export default function SettingsPage() {
   });
   const { disconnect } = useDisconnect();
 
+  /* -- Agent & Registry hooks -- */
+  const {
+    agent,
+    createAgent,
+    isAgentActive,
+    isLoading: agentLoading,
+    error: agentError,
+  } = useVeilAgent();
+  const {
+    registeredMeta,
+    registerMetaAddress,
+    isLoading: registryLoading,
+    error: registryError,
+  } = useStealthRegistry();
+
+  const [agentEnsInput, setAgentEnsInput] = useState("");
+  const [isCreatingAgent, setIsCreatingAgent] = useState(false);
+  const [isRegisteringMeta, setIsRegisteringMeta] = useState(false);
+
   /* -- Stealth state -- */
   const [stealthMeta, setStealthMeta] = useState<StealthMetaAddress | null>(
     null
@@ -332,6 +355,33 @@ export default function SettingsPage() {
     setStealthCount((c) => c + 1);
     toast.success("Stealth meta-address regenerated");
   }, []);
+
+  const handleCreateAgent = useCallback(async () => {
+    const name = agentEnsInput.trim() || ensName || "veil-agent";
+    setIsCreatingAgent(true);
+    try {
+      await createAgent(name);
+      toast.success("Agent identity created");
+      setAgentEnsInput("");
+    } catch {
+      toast.error(agentError ?? "Failed to create agent identity");
+    } finally {
+      setIsCreatingAgent(false);
+    }
+  }, [agentEnsInput, ensName, createAgent, agentError]);
+
+  const handleRegisterMeta = useCallback(async () => {
+    if (!stealthMeta) return;
+    setIsRegisteringMeta(true);
+    try {
+      await registerMetaAddress(stealthMeta.metaAddress);
+      toast.success("Stealth meta-address registered");
+    } catch {
+      toast.error(registryError ?? "Failed to register meta-address");
+    } finally {
+      setIsRegisteringMeta(false);
+    }
+  }, [stealthMeta, registerMetaAddress, registryError]);
 
   /* -- Policy state -- */
   const [dailyLimit, setDailyLimit] = useState("5000");
@@ -552,6 +602,54 @@ export default function SettingsPage() {
             </SectionLabel>
           </div>
 
+          {/* Agent Identity */}
+          <div className="bg-c2 border border-c3 p-4 space-y-3">
+            <SectionLabel>Agent Identity</SectionLabel>
+            {agent ? (
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <span
+                    className={clsx(
+                      "w-2 h-2",
+                      agent.active ? "bg-success" : "bg-error"
+                    )}
+                  />
+                  <span className="font-mono text-xs text-c9">
+                    {agent.active ? "Active" : "Inactive"}
+                  </span>
+                </div>
+                <p className="font-mono text-xs text-c7">
+                  ENS: <span className="text-c12">{agent.ensName}</span>
+                </p>
+                <p className="font-mono text-[10px] text-c5">
+                  Created: {new Date(agent.createdAt * 1000).toLocaleDateString()}
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                <p className="font-mono text-xs text-c5">
+                  No agent identity found. Create one to enable AI-driven stealth transactions.
+                </p>
+                <input
+                  type="text"
+                  value={agentEnsInput}
+                  onChange={(e) => setAgentEnsInput(e.target.value)}
+                  placeholder={ensName ?? "your-name.eth"}
+                  className="w-full bg-c1 border border-c3 px-4 py-2.5 text-sm text-c12 font-mono placeholder:text-c6 focus:border-c5 focus:outline-none transition-colors"
+                />
+                <Button
+                  variant="primary"
+                  size="sm"
+                  icon={<Bot size={12} />}
+                  loading={isCreatingAgent || agentLoading}
+                  onClick={handleCreateAgent}
+                >
+                  Create Agent Identity
+                </Button>
+              </div>
+            )}
+          </div>
+
           {/* Meta-address display */}
           <div className="bg-c2 border border-c3 p-4 space-y-3">
             <SectionLabel>Current Stealth Meta-Address</SectionLabel>
@@ -562,14 +660,34 @@ export default function SettingsPage() {
             ) : (
               <div className="h-4 w-full bg-c3 skeleton" />
             )}
-            <Button
-              variant="secondary"
-              size="sm"
-              icon={<RefreshCw size={12} />}
-              onClick={handleRegenerate}
-            >
-              Regenerate
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="secondary"
+                size="sm"
+                icon={<RefreshCw size={12} />}
+                onClick={handleRegenerate}
+              >
+                Regenerate
+              </Button>
+              <Button
+                variant="primary"
+                size="sm"
+                icon={<Upload size={12} />}
+                loading={isRegisteringMeta || registryLoading}
+                disabled={!stealthMeta}
+                onClick={handleRegisterMeta}
+              >
+                {registeredMeta ? "Re-register" : "Register"} Meta-Address
+              </Button>
+            </div>
+            {registeredMeta && (
+              <div className="border-t border-c3 pt-3 mt-2">
+                <SectionLabel>Registered On-Chain</SectionLabel>
+                <p className="font-mono text-[10px] text-green-500 mt-1 break-all">
+                  {registeredMeta}
+                </p>
+              </div>
+            )}
           </div>
 
           {/* Stealth stats */}
