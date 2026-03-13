@@ -1,0 +1,67 @@
+[
+  {
+    "type": "event",
+    "name": "AgentCreated",
+    "inputs": [
+      { "name": "owner", "type": "address", "indexed": true },
+      { "name": "ensName", "type": "string", "indexed": false }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "AgentDeactivated",
+    "inputs": [
+      { "name": "owner", "type": "address", "indexed": true }
+    ]
+  },
+  {
+    "type": "function",
+    "name": "agents",
+    "inputs": [
+      { "name": "owner", "type": "address" }
+    ],
+    "outputs": [
+      { "name": "owner", "type": "address" },
+      { "name": "ensName", "type": "string" },
+      { "name": "active", "type": "bool" },
+      { "name": "createdAt", "type": "uint256" }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "createAgent",
+    "inputs": [
+      { "name": "ensName", "type": "string" }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "deactivateAgent",
+    "inputs": [],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "getAgent",
+    "inputs": [
+      { "name": "owner", "type": "address" }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "tuple",
+        "components": [
+          { "name": "owner", "type": "address" },
+          { "name": "ensName", "type": "string" },
+          { "name": "active", "type": "bool" },
+          { "name": "createdAt", "type": "uint256" }
+        ]
+      }
+    ],
+    "stateMutability": "view"
+  }
+]

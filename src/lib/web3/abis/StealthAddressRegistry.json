@@ -1,0 +1,62 @@
+[
+  {
+    "type": "event",
+    "name": "StealthMetaAddressRegistered",
+    "inputs": [
+      { "name": "user", "type": "address", "indexed": true },
+      { "name": "stealthMetaAddress", "type": "bytes", "indexed": false }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "StealthPaymentAnnounced",
+    "inputs": [
+      { "name": "caller", "type": "address", "indexed": true },
+      { "name": "stealthAddress", "type": "address", "indexed": true },
+      { "name": "ephemeralPubKey", "type": "bytes", "indexed": false },
+      { "name": "metadata", "type": "bytes", "indexed": false }
+    ]
+  },
+  {
+    "type": "function",
+    "name": "registerStealthMetaAddress",
+    "inputs": [
+      { "name": "stealthMetaAddress", "type": "bytes" }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "getStealthMetaAddress",
+    "inputs": [
+      { "name": "user", "type": "address" }
+    ],
+    "outputs": [
+      { "name": "", "type": "bytes" }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "announcePayment",
+    "inputs": [
+      { "name": "stealthAddress", "type": "address" },
+      { "name": "ephemeralPubKey", "type": "bytes" },
+      { "name": "metadata", "type": "bytes" }
+    ],
+    "outputs": [],
+    "stateMutability": "payable"
+  },
+  {
+    "type": "function",
+    "name": "isRegistered",
+    "inputs": [
+      { "name": "user", "type": "address" }
+    ],
+    "outputs": [
+      { "name": "", "type": "bool" }
+    ],
+    "stateMutability": "view"
+  }
+]

@@ -1,0 +1,166 @@
+[
+  {
+    "type": "event",
+    "name": "PolicySet",
+    "inputs": [
+      { "name": "user", "type": "address", "indexed": true },
+      { "name": "dailyLimit", "type": "uint256", "indexed": false },
+      { "name": "perTxLimit", "type": "uint256", "indexed": false },
+      { "name": "requireApproval", "type": "bool", "indexed": false }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "SpendRecorded",
+    "inputs": [
+      { "name": "user", "type": "address", "indexed": true },
+      { "name": "token", "type": "address", "indexed": false },
+      { "name": "amount", "type": "uint256", "indexed": false },
+      { "name": "dailyTotal", "type": "uint256", "indexed": false }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "TokenAllowed",
+    "inputs": [
+      { "name": "user", "type": "address", "indexed": true },
+      { "name": "token", "type": "address", "indexed": false },
+      { "name": "allowed", "type": "bool", "indexed": false }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "PolicyViolation",
+    "inputs": [
+      { "name": "user", "type": "address", "indexed": true },
+      { "name": "reason", "type": "string", "indexed": false }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "DefaultTokensAdded",
+    "inputs": [
+      { "name": "user", "type": "address", "indexed": true }
+    ]
+  },
+  {
+    "type": "function",
+    "name": "CBBTC",
+    "inputs": [],
+    "outputs": [
+      { "name": "", "type": "address" }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "USDC",
+    "inputs": [],
+    "outputs": [
+      { "name": "", "type": "address" }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "policies",
+    "inputs": [
+      { "name": "user", "type": "address" }
+    ],
+    "outputs": [
+      { "name": "dailyLimit", "type": "uint256" },
+      { "name": "perTxLimit", "type": "uint256" },
+      { "name": "requireApproval", "type": "bool" },
+      { "name": "active", "type": "bool" }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "dailySpent",
+    "inputs": [
+      { "name": "user", "type": "address" },
+      { "name": "day", "type": "uint256" }
+    ],
+    "outputs": [
+      { "name": "", "type": "uint256" }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "allowedTokens",
+    "inputs": [
+      { "name": "user", "type": "address" },
+      { "name": "token", "type": "address" }
+    ],
+    "outputs": [
+      { "name": "", "type": "bool" }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "setPolicy",
+    "inputs": [
+      { "name": "dailyLimit", "type": "uint256" },
+      { "name": "perTxLimit", "type": "uint256" },
+      { "name": "requireApproval", "type": "bool" }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "checkPolicy",
+    "inputs": [
+      { "name": "user", "type": "address" },
+      { "name": "token", "type": "address" },
+      { "name": "amount", "type": "uint256" }
+    ],
+    "outputs": [
+      { "name": "passed", "type": "bool" },
+      { "name": "reason", "type": "string" }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "recordSpend",
+    "inputs": [
+      { "name": "user", "type": "address" },
+      { "name": "token", "type": "address" },
+      { "name": "amount", "type": "uint256" }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "setTokenAllowed",
+    "inputs": [
+      { "name": "token", "type": "address" },
+      { "name": "allowed", "type": "bool" }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "getRemainingAllowance",
+    "inputs": [
+      { "name": "user", "type": "address" }
+    ],
+    "outputs": [
+      { "name": "", "type": "uint256" }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "addDefaultTokens",
+    "inputs": [],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  }
+]
