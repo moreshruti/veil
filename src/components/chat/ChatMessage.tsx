@@ -71,7 +71,7 @@ export function ChatMessageBubble({
         <div className="flex items-center gap-1.5 mt-1">
           <CheckCircle size={12} className="text-success" />
           <a
-            href={`https://etherscan.io/tx/${metadata.txHash}`}
+            href={`https://basescan.org/tx/${metadata.txHash}`}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-1 text-[10px] font-mono text-success hover:underline"

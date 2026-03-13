@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useCallback, useRef } from "react";
-import { useAccount } from "wagmi";
-import { ShieldOff } from "lucide-react";
+import { useState, useCallback, useRef, useEffect } from "react";
+import { useAccount, useBalance, useReadContract } from "wagmi";
+import { formatUnits } from "viem";
+import { ShieldOff, Trash2 } from "lucide-react";
 import type { ChatMessage, TransactionPreview } from "@/lib/types";
 import { ChatWindow } from "@/components/chat/ChatWindow";
 import { ChatInput } from "@/components/chat/ChatInput";
@@ -11,11 +12,45 @@ import { useStealthTransaction } from "@/hooks/useStealthTransaction";
 import type { StealthTransactionResult } from "@/lib/stealth/transaction-flow";
 
 // ---------------------------------------------------------------------------
+// Token constants
+// ---------------------------------------------------------------------------
+
+const USDC_ADDRESS = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913" as const;
+const USDC_DECIMALS = 6;
+
+const CBBTC_ADDRESS = "0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf" as const;
+const CBBTC_DECIMALS = 8;
+
+const erc20BalanceOfAbi = [
+  {
+    name: "balanceOf",
+    type: "function",
+    stateMutability: "view",
+    inputs: [{ name: "account", type: "address" }],
+    outputs: [{ name: "", type: "uint256" }],
+  },
+] as const;
+
+const STORAGE_KEY = "veil-chat-messages";
+
+// ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 
 function uid(): string {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+}
+
+/**
+ * Returns true when the message is asking about portfolio / balances.
+ */
+function isPortfolioQuery(message: string): boolean {
+  const lower = message.toLowerCase();
+  return (
+    lower.includes("portfolio") ||
+    lower.includes("balance") ||
+    lower.includes("holdings")
+  );
 }
 
 /**
@@ -35,33 +70,40 @@ function isTransactionalIntent(message: string): boolean {
 }
 
 // ---------------------------------------------------------------------------
-// Mock responses for non-transactional queries
+// Portfolio response from real balances
 // ---------------------------------------------------------------------------
 
-function generateMockResponse(content: string): {
+interface TokenBalances {
+  eth: string;
+  usdc: string;
+  cbbtc: string;
+}
+
+function generatePortfolioResponse(balances: TokenBalances): {
   text: string;
   transaction?: TransactionPreview;
 } {
-  const lower = content.toLowerCase();
+  return {
+    text: [
+      "Here is your current portfolio:",
+      "",
+      `  ETH      ${balances.eth}`,
+      `  USDC     ${balances.usdc}`,
+      `  cbBTC    ${balances.cbbtc}`,
+      "",
+      "All balances fetched from stealth addresses. No public link to your identity.",
+    ].join("\n"),
+  };
+}
 
-  if (lower.includes("portfolio") || lower.includes("balance") || lower.includes("holdings")) {
-    return {
-      text: [
-        "Here is your current portfolio:",
-        "",
-        "  ETH      4.2000   ($16,159.50)",
-        "  USDC     2,500.00 ($2,500.00)",
-        "  cbBTC    0.1500   ($14,475.00)",
-        "  DAI      1,200.00 ($1,200.12)",
-        "",
-        "Total: ~$34,334.62",
-        "24h Change: +2.4%",
-        "",
-        "All balances fetched from stealth addresses. No public link to your identity.",
-      ].join("\n"),
-    };
-  }
+// ---------------------------------------------------------------------------
+// Mock responses for non-transactional, non-portfolio queries
+// ---------------------------------------------------------------------------
 
+function generateMockResponse(): {
+  text: string;
+  transaction?: TransactionPreview;
+} {
   return {
     text: [
       "I can help you with:",
@@ -110,11 +152,61 @@ function buildResponseText(
 // ---------------------------------------------------------------------------
 
 export default function ChatPage() {
-  const { isConnected } = useAccount();
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const { address, isConnected } = useAccount();
+  const [messages, setMessages] = useState<ChatMessage[]>(() => {
+    if (typeof window === "undefined") return [];
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      return stored ? (JSON.parse(stored) as ChatMessage[]) : [];
+    } catch {
+      return [];
+    }
+  });
   const [isTyping, setIsTyping] = useState(false);
 
   const { prepareTransaction, executeTransaction } = useStealthTransaction();
+
+  // ---- On-chain balances ----
+  const { data: ethBalance } = useBalance({ address });
+  const { data: usdcRaw } = useReadContract({
+    address: USDC_ADDRESS,
+    abi: erc20BalanceOfAbi,
+    functionName: "balanceOf",
+    args: address ? [address] : undefined,
+    chainId: 8453,
+  });
+  const { data: cbbtcRaw } = useReadContract({
+    address: CBBTC_ADDRESS,
+    abi: erc20BalanceOfAbi,
+    functionName: "balanceOf",
+    args: address ? [address] : undefined,
+    chainId: 8453,
+  });
+
+  const tokenBalances: TokenBalances = {
+    eth: ethBalance
+      ? Number(formatUnits(ethBalance.value, ethBalance.decimals)).toFixed(4)
+      : "0.0000",
+    usdc:
+      typeof usdcRaw === "bigint"
+        ? Number(formatUnits(usdcRaw, USDC_DECIMALS)).toFixed(2)
+        : "0.00",
+    cbbtc:
+      typeof cbbtcRaw === "bigint"
+        ? Number(formatUnits(cbbtcRaw, CBBTC_DECIMALS)).toFixed(8)
+        : "0.00000000",
+  };
+
+  // ---- Persist messages to localStorage ----
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(messages));
+  }, [messages]);
+
+  // ---- Clear chat ----
+  const handleClearChat = useCallback(() => {
+    setMessages([]);
+    localStorage.removeItem(STORAGE_KEY);
+  }, []);
 
   // Map message ID -> StealthTransactionResult so we can execute after approval
   const pendingResultsRef = useRef<Map<string, StealthTransactionResult>>(new Map());
@@ -135,16 +227,18 @@ export default function ChatPage() {
       setIsTyping(true);
 
       try {
-        // Non-transactional queries always get mock responses
+        // Non-transactional queries
         if (!isTransactionalIntent(content)) {
-          const mock = generateMockResponse(content);
+          const response = isPortfolioQuery(content)
+            ? generatePortfolioResponse(tokenBalances)
+            : generateMockResponse();
           const agentMessage: ChatMessage = {
             id: uid(),
             role: "agent",
-            content: mock.text,
+            content: response.text,
             timestamp: Date.now(),
-            metadata: mock.transaction
-              ? { transaction: mock.transaction, status: "pending" }
+            metadata: response.transaction
+              ? { transaction: response.transaction, status: "pending" }
               : undefined,
           };
           setMessages((prev) => [...prev, agentMessage]);
@@ -184,7 +278,7 @@ export default function ChatPage() {
         setIsTyping(false);
       }
     },
-    [prepareTransaction],
+    [prepareTransaction, tokenBalances],
   );
 
   // --------------------------------------------------
@@ -357,6 +451,18 @@ export default function ChatPage() {
   // --------------------------------------------------
   return (
     <div className="flex flex-col h-full">
+      {messages.length > 0 && (
+        <div className="flex items-center justify-end px-4 pt-3 pb-1">
+          <button
+            type="button"
+            onClick={handleClearChat}
+            className="flex items-center gap-1.5 px-2 py-1 font-mono text-[11px] uppercase tracking-wider text-c5 hover:text-error border border-transparent hover:border-c3 transition-colors duration-150 cursor-pointer"
+          >
+            <Trash2 size={12} />
+            Clear
+          </button>
+        </div>
+      )}
       <ChatWindow
         messages={messages}
         isTyping={isTyping}

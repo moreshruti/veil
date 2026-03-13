@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import {
   Shield,
   MessageSquare,
@@ -37,15 +38,17 @@ export default function Home() {
         className="pointer-events-none fixed inset-0 z-40 mx-auto max-w-[960px]"
         aria-hidden="true"
       >
-        <div className="absolute left-6 top-0 bottom-0 w-px bg-white/[0.08] flow-line-v" />
-        <div className="absolute right-6 top-0 bottom-0 w-px bg-white/[0.08] flow-line-v" />
+        <div className="flex justify-between h-full">
+          <div className="w-px bg-c3 flow-line-v" />
+          <div className="w-px bg-c3 flow-line-v" />
+        </div>
       </div>
 
-      <div className="max-w-[960px] mx-auto px-6">
+      <div className="max-w-[960px] mx-auto">
         {/* ============================================================ */}
         {/*  1. HERO                                                     */}
         {/* ============================================================ */}
-        <section className="pt-44 pb-28">
+        <section className="pt-44 pb-28 px-8">
           {/* Badge */}
           <div className="flex items-center gap-3 mb-10">
             <span className="h-px flex-1 max-w-12 border-t border-dashed border-c5" />
@@ -68,10 +71,10 @@ export default function Home() {
 
           {/* Buttons */}
           <div className="flex gap-3">
-            <button className="btn btn-filled">
+            <Link href="/chat" className="btn btn-filled">
               Launch App
               <ArrowRight size={14} />
-            </button>
+            </Link>
             <button
               onClick={() =>
                 document
@@ -369,14 +372,19 @@ export default function Home() {
             </p>
 
             <div className="flex items-center justify-center gap-3">
-              <button className="btn btn-filled">
+              <Link href="/chat" className="btn btn-filled">
                 Launch App
                 <ArrowRight size={14} />
-              </button>
-              <button className="btn">
+              </Link>
+              <a
+                href="https://github.com/moreshruti/veil"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn"
+              >
                 Read the Docs
                 <ExternalLink size={12} />
-              </button>
+              </a>
             </div>
 
             <p className="text-[10px] text-c5 font-mono mt-8 tracking-wide">

@@ -6,6 +6,8 @@ import {
 } from "../fileverse/client";
 import { parseIntent, type DeFiIntent, type X402Response } from "../ai/x402-client";
 import { TOKENS, type TokenSymbol } from "../web3/contracts";
+import { appendBuilderCode } from "../web3/builder-code";
+import { resolveENSToAddress, isENSName } from "../ens/resolve";
 import type { TransactionPreview } from "../types";
 
 // ---------------------------------------------------------------------------
@@ -25,6 +27,7 @@ export type StealthTransactionResult = {
   estimatedOutput: string;
   gasFee: string;
   route: string;
+  resolvedRecipient?: string;
   policyCheck: {
     passed: boolean;
     dailyLimit: string;
@@ -86,18 +89,107 @@ function generateEphemeralKey(): string {
 }
 
 // ---------------------------------------------------------------------------
-// Mock policy check (hardcoded for hackathon)
+// Policy check with localStorage-backed daily limit tracking
 // ---------------------------------------------------------------------------
+
+const DEFAULT_DAILY_LIMIT = 5000; // USD
+const STORAGE_KEY_POLICY = "veil_policy_settings";
+const STORAGE_KEY_SPENDING = "veil_daily_spending";
+
+type DailySpendingRecord = {
+  date: string; // ISO date string (YYYY-MM-DD)
+  totalUsd: number;
+};
+
+function getTodayDateString(): string {
+  return new Date().toISOString().split("T")[0];
+}
+
+function getDailyLimit(): number {
+  if (typeof window === "undefined") return DEFAULT_DAILY_LIMIT;
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY_POLICY);
+    if (raw) {
+      const settings = JSON.parse(raw);
+      if (typeof settings.dailyLimit === "number" && settings.dailyLimit > 0) {
+        return settings.dailyLimit;
+      }
+    }
+  } catch {
+    // Corrupted localStorage -- fall through to default
+  }
+  return DEFAULT_DAILY_LIMIT;
+}
+
+function getDailySpending(): DailySpendingRecord {
+  const today = getTodayDateString();
+  if (typeof window === "undefined") return { date: today, totalUsd: 0 };
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY_SPENDING);
+    if (raw) {
+      const record: DailySpendingRecord = JSON.parse(raw);
+      // Reset if the stored date is not today
+      if (record.date === today) return record;
+    }
+  } catch {
+    // Corrupted -- fall through to fresh record
+  }
+  return { date: today, totalUsd: 0 };
+}
+
+function saveDailySpending(record: DailySpendingRecord): void {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem(STORAGE_KEY_SPENDING, JSON.stringify(record));
+  } catch {
+    // Storage full or unavailable -- silent fail
+  }
+}
+
+/**
+ * Rough USD estimate for a given token amount.
+ * Uses hardcoded prices -- good enough for policy gating in a hackathon.
+ */
+function estimateUsdValue(amount: string, token: string): number {
+  const parsed = parseFloat(amount);
+  if (Number.isNaN(parsed)) return 0;
+
+  const prices: Record<string, number> = {
+    ETH: 2400,
+    WETH: 2400,
+    USDC: 1,
+    USDT: 1,
+    DAI: 1,
+    cbBTC: 96500,
+    WBTC: 96500,
+  };
+
+  const price = prices[token.toUpperCase()] ?? 0;
+  return parsed * price;
+}
 
 function runPolicyCheck(
   _userAddress: string,
-  _intent: DeFiIntent,
+  intent: DeFiIntent,
 ): StealthTransactionResult["policyCheck"] {
+  const dailyLimit = getDailyLimit();
+  const spending = getDailySpending();
+  const txUsd = estimateUsdValue(intent.amount ?? "0", intent.fromToken ?? "ETH");
+  const newTotal = spending.totalUsd + txUsd;
+  const passed = newTotal <= dailyLimit;
+
+  // Persist the updated spending if the check passes
+  if (passed) {
+    saveDailySpending({ date: spending.date, totalUsd: newTotal });
+  }
+
+  const formatUsd = (v: number) => `$${v.toLocaleString("en-US", { maximumFractionDigits: 2 })}`;
+
   return {
-    passed: true,
-    dailyLimit: "$5,000",
-    spent: "$1,200",
-    remaining: "$3,800",
+    passed,
+    dailyLimit: formatUsd(dailyLimit),
+    spent: formatUsd(newTotal),
+    remaining: formatUsd(Math.max(0, dailyLimit - newTotal)),
   };
 }
 
@@ -121,7 +213,16 @@ export async function prepareStealthTransaction(
   const x402 = await parseIntent(params.message);
   const intent = x402.intent;
 
-  // 2. Generate a fresh stealth meta-address and derive a one-time stealth address
+  // 2. Resolve ENS name if recipient looks like one
+  let resolvedRecipient: string | undefined;
+  if (intent.recipient && isENSName(intent.recipient)) {
+    const resolved = await resolveENSToAddress(intent.recipient);
+    if (resolved) {
+      resolvedRecipient = resolved;
+    }
+  }
+
+  // 3. Generate a fresh stealth meta-address and derive a one-time stealth address
   const meta = generateStealthMetaAddress();
   const ephemeralKey = generateEphemeralKey();
   const { stealthAddress, ephemeralPubKey } = await generateStealthAddress(
@@ -129,7 +230,7 @@ export async function prepareStealthTransaction(
     ephemeralKey,
   );
 
-  // 3. Run policy check
+  // 4. Run policy check
   const policyCheck = runPolicyCheck(params.userAddress, intent);
 
   return {
@@ -139,6 +240,7 @@ export async function prepareStealthTransaction(
     estimatedOutput: x402.estimatedOutput ?? intent.amount ?? "0",
     gasFee: x402.gasFee ?? "~$0.50",
     route: x402.route ?? "Direct Transfer (Stealth)",
+    resolvedRecipient,
     policyCheck,
   };
 }
@@ -159,14 +261,17 @@ export async function buildTransaction(
   const fromToken = intent.fromToken ?? "ETH";
   const amount = intent.amount ?? "0";
 
+  // Use the resolved ENS recipient if available, otherwise fall back to stealth address
+  const recipient = result.resolvedRecipient ?? stealthAddress;
+
   // Native ETH transfer (swap/send)
   if (fromToken.toUpperCase() === "ETH") {
     const decimals = resolveTokenDecimals("ETH");
     const value = parseUnits(amount, decimals);
 
     return {
-      to: stealthAddress,
-      data: "0x",
+      to: recipient,
+      data: appendBuilderCode("0x"),
       value,
     };
   }
@@ -177,8 +282,8 @@ export async function buildTransaction(
   if (!tokenAddress) {
     // Fallback: treat as native transfer if token address is unknown
     return {
-      to: stealthAddress,
-      data: "0x",
+      to: recipient,
+      data: appendBuilderCode("0x"),
       value: parseUnits(amount, 18),
     };
   }
@@ -186,15 +291,15 @@ export async function buildTransaction(
   const decimals = resolveTokenDecimals(fromToken);
   const parsedAmount = parseUnits(amount, decimals);
 
-  const data = encodeFunctionData({
+  const calldata = encodeFunctionData({
     abi: ERC20_TRANSFER_ABI,
     functionName: "transfer",
-    args: [stealthAddress as `0x${string}`, parsedAmount],
+    args: [recipient as `0x${string}`, parsedAmount],
   });
 
   return {
     to: tokenAddress,
-    data,
+    data: appendBuilderCode(calldata),
     value: BigInt(0),
   };
 }

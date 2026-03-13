@@ -5,6 +5,7 @@ import clsx from "clsx";
 import { Copy, Check, ArrowRight, Shield, Fuel } from "lucide-react";
 import type { TransactionPreview } from "@/lib/types";
 import { Button } from "@/components/ui/Button";
+import { playSuccess, playError } from "@/lib/sounds";
 
 interface TransactionCardProps {
   transaction: TransactionPreview;
@@ -151,7 +152,10 @@ export function TransactionCard({
             variant="primary"
             size="sm"
             className="flex-1"
-            onClick={onApprove}
+            onClick={() => {
+              playSuccess();
+              onApprove?.();
+            }}
           >
             Approve
           </Button>
@@ -159,7 +163,10 @@ export function TransactionCard({
             variant="danger"
             size="sm"
             className="flex-1"
-            onClick={onReject}
+            onClick={() => {
+              playError();
+              onReject?.();
+            }}
           >
             Reject
           </Button>

@@ -3,6 +3,7 @@
 import { useState, useRef, useCallback, type KeyboardEvent } from "react";
 import clsx from "clsx";
 import { ArrowRight } from "lucide-react";
+import { playClick } from "@/lib/sounds";
 
 interface ChatInputProps {
   onSend: (message: string) => void;
@@ -17,6 +18,7 @@ export function ChatInput({ onSend, disabled = false }: ChatInputProps) {
     const trimmed = value.trim();
     if (!trimmed || disabled) return;
 
+    playClick();
     onSend(trimmed);
     setValue("");
 
