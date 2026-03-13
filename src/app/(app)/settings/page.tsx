@@ -212,6 +212,78 @@ function IntegrationCard({
 }
 
 /* --------------------------------------------------------------------------
+   LOCALSTORAGE KEYS
+   -------------------------------------------------------------------------- */
+
+const POLICY_STORAGE_KEY = "veil-policy";
+const TX_RECORDS_STORAGE_KEY = "veil_tx_records";
+
+/* --------------------------------------------------------------------------
+   LOCALSTORAGE HELPERS
+   -------------------------------------------------------------------------- */
+
+type SavedPolicy = {
+  dailyLimit: string;
+  perTxLimit: string;
+  requireApproval: boolean;
+  allowedTokens: AllowedToken[];
+};
+
+type TxRecord = {
+  id: string;
+  timestamp: number;
+  action: string;
+  amount: string;
+  stealthAddress: string;
+  status: string;
+};
+
+function loadPolicy(): SavedPolicy | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = localStorage.getItem(POLICY_STORAGE_KEY);
+    return raw ? (JSON.parse(raw) as SavedPolicy) : null;
+  } catch {
+    return null;
+  }
+}
+
+function loadTxRecords(): TxRecord[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = localStorage.getItem(TX_RECORDS_STORAGE_KEY);
+    return raw ? (JSON.parse(raw) as TxRecord[]) : [];
+  } catch {
+    return [];
+  }
+}
+
+function countUniqueStealthAddresses(records: TxRecord[]): number {
+  const unique = new Set(records.map((r) => r.stealthAddress).filter(Boolean));
+  return unique.size;
+}
+
+function countPrivateTransactions(records: TxRecord[]): number {
+  return records.length;
+}
+
+function sumTodaysSpending(records: TxRecord[]): number {
+  const now = new Date();
+  const startOfDay = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate()
+  ).getTime();
+
+  return records
+    .filter((r) => r.timestamp >= startOfDay)
+    .reduce((sum, r) => {
+      const amount = parseFloat(r.amount);
+      return sum + (isNaN(amount) ? 0 : amount);
+    }, 0);
+}
+
+/* --------------------------------------------------------------------------
    SETTINGS PAGE
    -------------------------------------------------------------------------- */
 
@@ -243,10 +315,16 @@ export default function SettingsPage() {
   const [stealthMeta, setStealthMeta] = useState<StealthMetaAddress | null>(
     null
   );
-  const [stealthCount, setStealthCount] = useState(12);
+  const [stealthCount, setStealthCount] = useState(0);
+  const [privateTxCount, setPrivateTxCount] = useState(0);
 
   useEffect(() => {
     setStealthMeta(generateStealthMetaAddress());
+
+    // Load real counts from localStorage transaction records
+    const records = loadTxRecords();
+    setStealthCount(countUniqueStealthAddresses(records));
+    setPrivateTxCount(countPrivateTransactions(records));
   }, []);
 
   const handleRegenerate = useCallback(() => {
@@ -262,7 +340,27 @@ export default function SettingsPage() {
   const [allowedTokens, setAllowedTokens] = useState<Set<AllowedToken>>(
     new Set(ALLOWED_TOKENS)
   );
-  const dailySpent = 1247.5; // mock: amount spent today
+  const [dailySpent, setDailySpent] = useState(0);
+
+  // Load saved policy and daily spending from localStorage on mount
+  useEffect(() => {
+    const saved = loadPolicy();
+    if (saved) {
+      setDailyLimit(saved.dailyLimit);
+      setPerTxLimit(saved.perTxLimit);
+      setRequireApproval(saved.requireApproval);
+      setAllowedTokens(
+        new Set(
+          saved.allowedTokens.filter((t): t is AllowedToken =>
+            ALLOWED_TOKENS.includes(t as AllowedToken)
+          )
+        )
+      );
+    }
+
+    const records = loadTxRecords();
+    setDailySpent(sumTodaysSpending(records));
+  }, []);
 
   function toggleToken(token: AllowedToken) {
     setAllowedTokens((prev) => {
@@ -277,13 +375,21 @@ export default function SettingsPage() {
   }
 
   function handleSavePolicy() {
-    console.log("Policy saved:", {
-      dailyLimit: Number(dailyLimit),
-      perTxLimit: Number(perTxLimit),
+    const policy: SavedPolicy = {
+      dailyLimit,
+      perTxLimit,
       requireApproval,
       allowedTokens: Array.from(allowedTokens),
-    });
-    toast.success("Policy updated");
+    };
+
+    try {
+      localStorage.setItem(POLICY_STORAGE_KEY, JSON.stringify(policy));
+    } catch {
+      toast.error("Failed to save policy to local storage");
+      return;
+    }
+
+    toast.success("Policy saved to local storage");
   }
 
   /* -- Copy address -- */
@@ -477,7 +583,7 @@ export default function SettingsPage() {
             <div className="px-4 py-3">
               <SectionLabel>Private Transactions</SectionLabel>
               <p className="text-lg text-c12 font-mono tabular-nums mt-1">
-                8
+                {privateTxCount}
               </p>
             </div>
           </div>
@@ -594,15 +700,15 @@ export default function SettingsPage() {
               icon={<Lock size={18} />}
               name="BitGo"
               description="Multi-Sig Vault"
-              status="connected"
-              detail="Institutional-grade custody. Policy engine active."
+              status="pending"
+              detail="Mock Mode — Configure BITGO_ACCESS_TOKEN in .env for live custody."
             />
             <IntegrationCard
               icon={<Brain size={18} />}
               name="HeyElsa"
               description="AI Engine (x402)"
-              status="active"
-              detail="Natural language transaction parsing online."
+              status="pending"
+              detail="Mock Mode — Configure HEYELSA_X402_ENDPOINT in .env for live parsing."
             />
             <IntegrationCard
               icon={<Fingerprint size={18} />}
@@ -615,8 +721,12 @@ export default function SettingsPage() {
               icon={<FileText size={18} />}
               name="Fileverse"
               description="Encrypted Records"
-              status="active"
-              detail="7 encrypted records stored"
+              status={privateTxCount > 0 ? "active" : "pending"}
+              detail={
+                privateTxCount > 0
+                  ? `${privateTxCount} encrypted record${privateTxCount === 1 ? "" : "s"} stored locally`
+                  : "Mock Mode — No records stored yet. Configure FILEVERSE_API_KEY in .env for live storage."
+              }
             />
             <IntegrationCard
               icon={<Globe size={18} />}
@@ -630,6 +740,9 @@ export default function SettingsPage() {
               }
             />
           </div>
+          <p className="font-mono text-[10px] text-c5 mt-2">
+            Configure API keys in .env for live mode. All services run in mock mode by default.
+          </p>
         </section>
       </div>
     </div>
