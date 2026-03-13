@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import {
   Shield,
   MessageSquare,
@@ -68,10 +69,10 @@ export default function Home() {
 
           {/* Buttons */}
           <div className="flex gap-3">
-            <button className="btn btn-filled">
+            <Link href="/chat" className="btn btn-filled">
               Launch App
               <ArrowRight size={14} />
-            </button>
+            </Link>
             <button
               onClick={() =>
                 document
@@ -369,14 +370,19 @@ export default function Home() {
             </p>
 
             <div className="flex items-center justify-center gap-3">
-              <button className="btn btn-filled">
+              <Link href="/chat" className="btn btn-filled">
                 Launch App
                 <ArrowRight size={14} />
-              </button>
-              <button className="btn">
+              </Link>
+              <a
+                href="https://github.com/moreshruti/veil"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn"
+              >
                 Read the Docs
                 <ExternalLink size={12} />
-              </button>
+              </a>
             </div>
 
             <p className="text-[10px] text-c5 font-mono mt-8 tracking-wide">

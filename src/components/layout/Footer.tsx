@@ -1,9 +1,9 @@
 import { ArrowUpRight } from "lucide-react";
 
 const LINKS = [
-  { label: "GitHub", href: "https://github.com" },
-  { label: "Docs", href: "#" },
-  { label: "X", href: "https://x.com" },
+  { label: "GitHub", href: "https://github.com/moreshruti/veil" },
+  { label: "Docs", href: "https://github.com/moreshruti/veil#readme" },
+  { label: "X", href: "https://x.com/moreshruti" },
 ] as const;
 
 export function Footer() {
