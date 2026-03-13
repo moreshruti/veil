@@ -299,6 +299,29 @@ h6 {
   }
 }
 
+/* 5h. Orbital Rotate -- concentric ring spin */
+@keyframes orbital-rotate {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes orbital-rotate-reverse {
+  0% { transform: rotate(360deg); }
+  100% { transform: rotate(0deg); }
+}
+
+/* 5i. Orbital Pulse -- center glow */
+@keyframes orbital-pulse {
+  0%, 100% { opacity: 0.4; box-shadow: 0 0 8px 2px var(--c4); }
+  50% { opacity: 1; box-shadow: 0 0 16px 4px var(--c5); }
+}
+
+/* 5j. Shiny Text -- shimmer sweep */
+@keyframes shine {
+  0% { background-position: 100% 0; }
+  100% { background-position: -100% 0; }
+}
+
 /* --------------------------------------------------------------------------
    6. ANIMATION UTILITY CLASSES
    -------------------------------------------------------------------------- */
@@ -386,6 +409,50 @@ h6 {
 .stack-layer.is-visible:nth-child(6) { animation-delay: 300ms; }
 .stack-layer.is-visible:nth-child(7) { animation-delay: 360ms; }
 .stack-layer.is-visible:nth-child(8) { animation-delay: 420ms; }
+
+/* Shiny text -- gradient sweep */
+.shiny-text {
+  background: linear-gradient(120deg, var(--c7) 40%, var(--c12) 50%, var(--c7) 60%);
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shine 4s ease-in-out infinite;
+}
+
+/* Orbital Logo -- component layout */
+.orbital-logo {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.orbital-logo > svg {
+  position: absolute;
+  inset: 0;
+}
+
+.orbital-ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.orbital-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 4px;
+  height: 4px;
+  transform: translate(-50%, -50%);
+  background: var(--c8);
+  animation: orbital-pulse 3s ease-in-out infinite;
+}
 
 /* --------------------------------------------------------------------------
    7. BACKGROUND PATTERNS
@@ -639,5 +706,20 @@ h6 {
   .stack-layer {
     opacity: 1;
     transform: none;
+  }
+
+  .orbital-ring {
+    animation: none !important;
+  }
+
+  .orbital-center {
+    animation: none;
+    opacity: 0.8;
+  }
+
+  .shiny-text {
+    animation: none;
+    background: none;
+    -webkit-text-fill-color: var(--c12);
   }
 }
