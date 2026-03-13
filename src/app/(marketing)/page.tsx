@@ -38,15 +38,17 @@ export default function Home() {
         className="pointer-events-none fixed inset-0 z-40 mx-auto max-w-[960px]"
         aria-hidden="true"
       >
-        <div className="absolute left-6 top-0 bottom-0 w-px bg-white/[0.08] flow-line-v" />
-        <div className="absolute right-6 top-0 bottom-0 w-px bg-white/[0.08] flow-line-v" />
+        <div className="flex justify-between h-full">
+          <div className="w-px bg-c3 flow-line-v" />
+          <div className="w-px bg-c3 flow-line-v" />
+        </div>
       </div>
 
-      <div className="max-w-[960px] mx-auto px-6">
+      <div className="max-w-[960px] mx-auto">
         {/* ============================================================ */}
         {/*  1. HERO                                                     */}
         {/* ============================================================ */}
-        <section className="pt-44 pb-28">
+        <section className="pt-44 pb-28 px-8">
           {/* Badge */}
           <div className="flex items-center gap-3 mb-10">
             <span className="h-px flex-1 max-w-12 border-t border-dashed border-c5" />

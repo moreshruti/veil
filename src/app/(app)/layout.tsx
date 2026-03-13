@@ -46,7 +46,7 @@ export default function AppLayout({
       {/* Sidebar */}
       <aside
         className={clsx(
-          "shrink-0 flex flex-col border-r border-c3 bg-c1 transition-all duration-200",
+          "shrink-0 flex flex-col border-r border-c3 bg-c1 transition-all duration-200 overflow-hidden",
           collapsed ? "w-14" : "w-60"
         )}
       >
@@ -92,7 +92,7 @@ export default function AppLayout({
         )}
         {collapsed && (
           <div className="px-3 pb-3 flex justify-center">
-            <WalletButton />
+            <WalletButton compact />
           </div>
         )}
 

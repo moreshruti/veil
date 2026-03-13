@@ -337,15 +337,16 @@ h6 {
   top: 0;
   left: 0;
   width: 1px;
-  height: 70px;
+  height: 80px;
   background: linear-gradient(
     180deg,
     transparent,
-    var(--c8),
+    var(--c6),
     transparent
   );
-  animation: flow-pulse-v 3s ease-in-out infinite;
+  animation: flow-pulse-v 4s ease-in-out infinite;
   pointer-events: none;
+  z-index: 50;
 }
 
 /* Icon morph -- apply to SVG elements */
@@ -464,7 +465,7 @@ h6 {
   background: linear-gradient(
     90deg,
     transparent,
-    var(--accent),
+    var(--c8),
     transparent
   );
   animation: flow-pulse 3s ease-in-out infinite;

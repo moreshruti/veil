@@ -9,7 +9,7 @@ import {
 } from "wagmi";
 import { mainnet, base, baseSepolia } from "wagmi/chains";
 import { useModal } from "connectkit";
-import { Copy, ExternalLink, LogOut, ChevronDown } from "lucide-react";
+import { Copy, ExternalLink, LogOut, ChevronDown, Wallet } from "lucide-react";
 import clsx from "clsx";
 import { formatAddress } from "@/lib/ens/resolve";
 import type { Address } from "viem";
@@ -45,7 +45,7 @@ function NetworkBadge({ chainId }: { chainId: number | undefined }) {
   );
 }
 
-export function WalletButton() {
+export function WalletButton({ compact = false }: { compact?: boolean }) {
   const { address, isConnected, chain } = useAccount();
   const { data: ensName } = useEnsName({
     address,
@@ -75,6 +75,25 @@ export function WalletButton() {
   }, []);
 
   if (!isConnected || !address) {
+    if (compact) {
+      return (
+        <button
+          onClick={() => setOpen(true)}
+          className={clsx(
+            "inline-flex items-center justify-center",
+            "w-8 h-8",
+            "transition-all duration-150 ease-out",
+            "cursor-pointer select-none",
+            "bg-zinc-200 text-zinc-950",
+            "border border-zinc-400/50",
+            "hover:bg-zinc-100"
+          )}
+          aria-label="Connect Wallet"
+        >
+          <Wallet size={14} />
+        </button>
+      );
+    }
     return (
       <button
         onClick={() => setOpen(true)}
@@ -97,6 +116,29 @@ export function WalletButton() {
   }
 
   const displayName = formatAddress(address, ensName ?? undefined);
+
+  if (compact) {
+    return (
+      <button
+        onClick={() => setDropdownOpen((prev) => !prev)}
+        className={clsx(
+          "inline-flex items-center justify-center",
+          "w-8 h-8",
+          "bg-c2 border border-c3",
+          "transition-all duration-150 ease-out",
+          "cursor-pointer select-none",
+          "hover:bg-c3 hover:border-c4"
+        )}
+        aria-label={displayName}
+      >
+        {ensAvatar ? (
+          <img src={ensAvatar} alt={displayName} className="w-5 h-5 object-cover" />
+        ) : (
+          <span className="w-5 h-5 bg-accent/20 border border-accent/40" />
+        )}
+      </button>
+    );
+  }
 
   function handleCopy() {
     if (address) navigator.clipboard.writeText(address);
