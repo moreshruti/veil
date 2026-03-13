@@ -9,6 +9,7 @@ import {
   toTransactionPreview,
   type StealthTransactionResult,
 } from "@/lib/stealth/transaction-flow";
+import { approveTransaction as bitgoApprove } from "@/lib/bitgo/client";
 import type { TransactionPreview } from "@/lib/types";
 
 // ---------------------------------------------------------------------------
@@ -98,6 +99,12 @@ export function useStealthTransaction() {
           // Adds a small delay to mimic on-chain confirmation
           await new Promise((resolve) => setTimeout(resolve, 1500));
           txHash = simulatedTxHash();
+        }
+
+        // Complete BitGo approval flow if a proposal was created during preparation.
+        // The client falls back to mocks when BITGO_ACCESS_TOKEN is unset.
+        if (result.bitgoProposalId) {
+          await bitgoApprove(userAddress, result.bitgoProposalId, txHash);
         }
 
         // Record to Fileverse
