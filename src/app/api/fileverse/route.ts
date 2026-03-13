@@ -1,10 +1,10 @@
+// Production: replace with Fileverse SDK (npm i @fileverse/sdk)
+
 import { NextRequest, NextResponse } from "next/server";
+import { readFileSync, writeFileSync, existsSync } from "fs";
 
 // ---------------------------------------------------------------------------
-// Fileverse API route
-// In-memory store for the hackathon demo.
-// GET: list records for a user (?userId=...) or fetch one (?docId=...)
-// POST: save a new transaction record
+// Types
 // ---------------------------------------------------------------------------
 
 type TransactionRecord = {
@@ -18,43 +18,85 @@ type TransactionRecord = {
   status: "pending" | "confirmed" | "failed";
 };
 
-// In-memory store — persists for the lifetime of the server process
+// ---------------------------------------------------------------------------
+// Persistence — in-memory Map backed by /tmp/veil-records.json
+// ---------------------------------------------------------------------------
+
+const PERSIST_PATH = "/tmp/veil-records.json";
+
 const store = new Map<string, TransactionRecord>();
+
+/** Load records from disk into the in-memory Map (runs once on cold start). */
+function hydrate(): void {
+  if (store.size > 0) return; // already loaded
+  try {
+    if (existsSync(PERSIST_PATH)) {
+      const raw = readFileSync(PERSIST_PATH, "utf-8");
+      const entries = JSON.parse(raw) as [string, TransactionRecord][];
+      for (const [key, value] of entries) {
+        store.set(key, value);
+      }
+    }
+  } catch (err) {
+    console.error("[fileverse] failed to hydrate from disk:", err);
+  }
+}
+
+/** Flush the in-memory Map to disk. */
+function persist(): void {
+  try {
+    const entries = Array.from(store.entries());
+    writeFileSync(PERSIST_PATH, JSON.stringify(entries, null, 2), "utf-8");
+  } catch (err) {
+    console.error("[fileverse] failed to persist to disk:", err);
+  }
+}
+
+// Hydrate on module load
+hydrate();
 
 // ---------------------------------------------------------------------------
 // GET handler
 // ---------------------------------------------------------------------------
 
 export async function GET(request: NextRequest) {
-  const { searchParams } = new URL(request.url);
-  const userId = searchParams.get("userId");
-  const docId = searchParams.get("docId");
+  hydrate();
 
-  // Fetch a single record by docId
-  if (docId) {
-    const id = docId.replace(/^doc_/, "");
-    const record = store.get(id) ?? null;
-    if (!record) {
-      return NextResponse.json(null, { status: 404 });
+  try {
+    const { searchParams } = new URL(request.url);
+    const userId = searchParams.get("userId");
+    const docId = searchParams.get("docId");
+
+    // Fetch a single record by docId
+    if (docId) {
+      const id = docId.replace(/^doc_/, "");
+      const record = store.get(id) ?? null;
+      if (!record) {
+        return NextResponse.json(null, { status: 404 });
+      }
+      return NextResponse.json(record);
     }
-    return NextResponse.json(record);
-  }
 
-  // List all records (optionally filtered by userId / stealthAddress prefix)
-  const records = Array.from(store.values());
+    // List all records (optionally filtered by userId / stealthAddress prefix)
+    const records = Array.from(store.values());
 
-  if (userId) {
-    // For demo purposes, filter by stealthAddress containing the userId
-    // In production this would use proper user-doc associations
-    const filtered = records.filter(
-      (r) =>
-        r.stealthAddress.toLowerCase().includes(userId.toLowerCase()) ||
-        true, // Return all for demo
+    if (userId) {
+      const filtered = records.filter(
+        (r) =>
+          r.stealthAddress.toLowerCase().includes(userId.toLowerCase()) ||
+          true, // Return all for demo
+      );
+      return NextResponse.json(filtered);
+    }
+
+    return NextResponse.json(records);
+  } catch (err) {
+    console.error("[fileverse] GET error:", err);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
     );
-    return NextResponse.json(filtered);
   }
-
-  return NextResponse.json(records);
 }
 
 // ---------------------------------------------------------------------------
@@ -62,26 +104,39 @@ export async function GET(request: NextRequest) {
 // ---------------------------------------------------------------------------
 
 export async function POST(request: NextRequest) {
-  const body = (await request.json()) as TransactionRecord;
+  hydrate();
 
-  if (!body.id) {
-    return NextResponse.json({ error: "Missing record id" }, { status: 400 });
+  try {
+    const body = (await request.json()) as TransactionRecord;
+
+    if (!body.id) {
+      return NextResponse.json({ error: "Missing record id" }, { status: 400 });
+    }
+
+    if (!body.txHash) {
+      return NextResponse.json({ error: "Missing txHash" }, { status: 400 });
+    }
+
+    const record: TransactionRecord = {
+      id: body.id,
+      timestamp: body.timestamp ?? Date.now(),
+      action: body.action ?? "unknown",
+      tokens: body.tokens ?? { from: "", to: "" },
+      amount: body.amount ?? "0",
+      stealthAddress: body.stealthAddress ?? "",
+      txHash: body.txHash,
+      status: body.status ?? "pending",
+    };
+
+    store.set(record.id, record);
+    persist();
+
+    return NextResponse.json({ docId: `doc_${record.id}` }, { status: 201 });
+  } catch (err) {
+    console.error("[fileverse] POST error:", err);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
-
-  if (!body.txHash) {
-    return NextResponse.json({ error: "Missing txHash" }, { status: 400 });
-  }
-
-  store.set(body.id, {
-    id: body.id,
-    timestamp: body.timestamp ?? Date.now(),
-    action: body.action ?? "unknown",
-    tokens: body.tokens ?? { from: "", to: "" },
-    amount: body.amount ?? "0",
-    stealthAddress: body.stealthAddress ?? "",
-    txHash: body.txHash,
-    status: body.status ?? "pending",
-  });
-
-  return NextResponse.json({ docId: `doc_${body.id}` }, { status: 201 });
 }

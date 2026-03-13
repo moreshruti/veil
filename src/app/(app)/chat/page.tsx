@@ -3,11 +3,10 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import { useAccount, useBalance, useReadContract } from "wagmi";
 import { formatUnits } from "viem";
-import { ShieldOff, Trash2 } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import type { ChatMessage, TransactionPreview } from "@/lib/types";
 import { ChatWindow } from "@/components/chat/ChatWindow";
 import { ChatInput } from "@/components/chat/ChatInput";
-import { WalletButton } from "@/components/wallet/WalletButton";
 import { useStealthTransaction } from "@/hooks/useStealthTransaction";
 import type { StealthTransactionResult } from "@/lib/stealth/transaction-flow";
 
@@ -427,27 +426,7 @@ export default function ChatPage() {
   }
 
   // --------------------------------------------------
-  // Wallet gate
-  // --------------------------------------------------
-  if (!isConnected) {
-    return (
-      <div className="flex-1 flex flex-col items-center justify-center gap-6 px-6">
-        <ShieldOff size={48} className="text-c5" />
-        <div className="text-center">
-          <h2 className="font-mono text-lg text-c12 mb-2">
-            Connect your wallet to start chatting with Veil
-          </h2>
-          <p className="font-mono text-sm text-c7 max-w-sm">
-            Your conversations are tied to your wallet. Connect to begin.
-          </p>
-        </div>
-        <WalletButton />
-      </div>
-    );
-  }
-
-  // --------------------------------------------------
-  // Render
+  // Render (wallet gate handled by app layout)
   // --------------------------------------------------
   return (
     <div className="flex flex-col h-full">

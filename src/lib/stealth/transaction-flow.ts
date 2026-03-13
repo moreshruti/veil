@@ -8,6 +8,8 @@ import { parseIntent, type DeFiIntent, type X402Response } from "../ai/x402-clie
 import { TOKENS, type TokenSymbol } from "../web3/contracts";
 import { appendBuilderCode } from "../web3/builder-code";
 import { resolveENSToAddress, isENSName } from "../ens/resolve";
+import { proposeTransaction as bitgoPropose } from "../bitgo/client";
+import { announceStealthPayment } from "@/hooks/useStealthRegistry";
 import type { TransactionPreview } from "../types";
 
 // ---------------------------------------------------------------------------
@@ -34,6 +36,8 @@ export type StealthTransactionResult = {
     spent: string;
     remaining: string;
   };
+  /** BitGo transaction proposal ID -- used to approve the tx after wallet signing */
+  bitgoProposalId?: string;
 };
 
 // ---------------------------------------------------------------------------
@@ -230,8 +234,29 @@ export async function prepareStealthTransaction(
     ephemeralKey,
   );
 
-  // 4. Run policy check
+  // 4. Run local policy check
   const policyCheck = runPolicyCheck(params.userAddress, intent);
+
+  // 5. Propose transaction through BitGo for multi-sig policy validation
+  //    The client falls back to mocks when BITGO_ACCESS_TOKEN is unset,
+  //    so this always resolves without breaking the flow.
+  let bitgoProposalId: string | undefined;
+
+  if (policyCheck.passed) {
+    const recipient = resolvedRecipient ?? stealthAddress;
+    const proposal = await bitgoPropose(params.userAddress, {
+      recipients: [{ address: recipient, amount: intent.amount ?? "0" }],
+      coin: (intent.fromToken ?? "ETH").toLowerCase(),
+      memo: `veil:stealth:${stealthAddress}`,
+    });
+
+    bitgoProposalId = proposal.txId;
+
+    // If BitGo's policy engine rejected the proposal, override the local check
+    if (proposal.state === "rejected") {
+      policyCheck.passed = false;
+    }
+  }
 
   return {
     intent,
@@ -242,6 +267,7 @@ export async function prepareStealthTransaction(
     route: x402.route ?? "Direct Transfer (Stealth)",
     resolvedRecipient,
     policyCheck,
+    bitgoProposalId,
   };
 }
 
@@ -327,7 +353,21 @@ export async function recordTransaction(
     status: "confirmed",
   };
 
-  return saveTransactionRecord(record);
+  const saved = await saveTransactionRecord(record);
+
+  // Announce stealth payment to the registry (non-blocking).
+  // Wrapped in try/catch so a registry failure never breaks the tx flow.
+  try {
+    await announceStealthPayment(
+      result.stealthAddress,
+      result.ephemeralPubKey,
+      `0x${Buffer.from(txHash).toString("hex")}`,
+    );
+  } catch {
+    // Registry announcement is best-effort -- silent fail
+  }
+
+  return saved;
 }
 
 // ---------------------------------------------------------------------------

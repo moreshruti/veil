@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import clsx from "clsx";
 import { HistoryList } from "@/components/chat/HistoryList";
 import type {
@@ -11,64 +12,6 @@ import {
   getTransactionRecords,
   type TransactionRecord,
 } from "@/lib/fileverse/client";
-
-/* --------------------------------------------------------------------------
-   SEED DATA — shown on first visit so the page isn't blank
-   -------------------------------------------------------------------------- */
-
-const SEED_TRANSACTIONS: HistoryTransaction[] = [
-  {
-    id: "seed_1",
-    timestamp: Date.now() - 3_600_000,
-    action: "swap",
-    fromToken: "ETH",
-    toToken: "USDC",
-    amount: "2.5 ETH",
-    outputAmount: "4,250 USDC",
-    stealthAddress: "0x7a3b...f91e",
-    fullStealthAddress:
-      "0x7a3b4c8d9e2f1a0b6c5d4e3f2a1b0c9d8e7f6a5b4c3d2e1f0a9b8c7d6ef91e",
-    txHash:
-      "0xabc123def456789012345678901234567890abcdef1234567890abcdef456789",
-    status: "confirmed",
-    fileversDocId: "fv_doc_001",
-    policyCheckPassed: true,
-  },
-  {
-    id: "seed_2",
-    timestamp: Date.now() - 7_200_000,
-    action: "send",
-    fromToken: "USDC",
-    toToken: "USDC",
-    amount: "1,000 USDC",
-    outputAmount: "1,000 USDC",
-    stealthAddress: "0x9c2d...a3b7",
-    fullStealthAddress:
-      "0x9c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a3b7",
-    txHash:
-      "0xdef789abc123456789012345678901234567890abcdef1234567890abc123456",
-    status: "confirmed",
-    fileversDocId: "fv_doc_002",
-    policyCheckPassed: true,
-  },
-  {
-    id: "seed_3",
-    timestamp: Date.now() - 14_400_000,
-    action: "bridge",
-    fromToken: "ETH",
-    toToken: "ETH",
-    amount: "1.0 ETH",
-    outputAmount: "0.998 ETH",
-    stealthAddress: "0x5e1f...c8d2",
-    fullStealthAddress:
-      "0x5e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c8d2",
-    txHash:
-      "0x456789def123abc789012345678901234567890abcdef1234567890def789abc",
-    status: "pending",
-    fileversDocId: "fv_doc_003",
-    policyCheckPassed: true,
-  },
-];
 
 /* --------------------------------------------------------------------------
    HELPERS
@@ -150,23 +93,18 @@ export default function HistoryPage() {
 
     async function loadRecords() {
       try {
-        // Attempt to fetch real records from Fileverse / localStorage
-        const records = await getTransactionRecords("default");
+        const records = await getTransactionRecords();
         if (cancelled) return;
 
-        if (records.length > 0) {
-          // Real data exists — map and use it
-          const mapped = records.map(toHistoryTransaction);
-          // Sort newest first
-          mapped.sort((a, b) => b.timestamp - a.timestamp);
-          setTransactions(mapped);
-        } else {
-          // No records yet — show seed data so the page isn't empty
-          setTransactions(SEED_TRANSACTIONS);
-        }
+        // Map and sort newest first
+        const mapped = records
+          .map(toHistoryTransaction)
+          .sort((a, b) => b.timestamp - a.timestamp);
+
+        setTransactions(mapped);
       } catch {
-        // On error, fall back to seed data
-        setTransactions(SEED_TRANSACTIONS);
+        // On error, show empty state
+        setTransactions([]);
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -231,6 +169,37 @@ export default function HistoryPage() {
               <div className="h-4 w-16 bg-c3 animate-pulse" />
             </div>
           ))}
+        </div>
+      </div>
+    );
+  }
+
+  /* Empty state */
+  if (transactions.length === 0) {
+    return (
+      <div className="container-narrow py-12 space-y-8">
+        <div className="space-y-2">
+          <h1 className="text-2xl font-pixel text-c11 tracking-tight">
+            Transaction History
+          </h1>
+          <p className="text-[10px] uppercase tracking-[0.2em] text-c5 font-mono">
+            Encrypted records from Fileverse
+          </p>
+        </div>
+
+        <div className="border border-c3 bg-c2 px-6 py-16 flex flex-col items-center justify-center gap-4">
+          <div className="w-10 h-10 border border-c3 flex items-center justify-center">
+            <span className="text-c5 text-lg font-mono">/</span>
+          </div>
+          <p className="text-sm text-c7 font-mono text-center">
+            No transactions yet.
+          </p>
+          <Link
+            href="/chat"
+            className="text-xs font-mono uppercase tracking-widest text-accent hover:underline transition-colors"
+          >
+            Start a conversation with Veil
+          </Link>
         </div>
       </div>
     );

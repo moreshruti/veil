@@ -13,6 +13,7 @@ import {
   Fingerprint,
   FileText,
 } from "lucide-react";
+import { OrbitalLogo } from "@/components/ui/OrbitalLogo";
 
 /* ------------------------------------------------------------------ */
 /*  Reusable primitives                                                */
@@ -49,6 +50,11 @@ export default function Home() {
         {/*  1. HERO                                                     */}
         {/* ============================================================ */}
         <section className="pt-44 pb-28 px-8">
+          {/* Orbital Logo */}
+          <div className="flex justify-center mb-12">
+            <OrbitalLogo />
+          </div>
+
           {/* Badge */}
           <div className="flex items-center gap-3 mb-10">
             <span className="h-px flex-1 max-w-12 border-t border-dashed border-c5" />
@@ -57,7 +63,7 @@ export default function Home() {
           </div>
 
           {/* Headline */}
-          <h1 className="text-4xl sm:text-5xl md:text-6xl uppercase tracking-tight text-c12 leading-[1.1] mb-6">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl uppercase tracking-tight text-c12 leading-[1.1] mb-6 shiny-text">
             Talk To Your
             <br />
             Money Privately
