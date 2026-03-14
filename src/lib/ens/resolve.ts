@@ -4,7 +4,11 @@ import { normalize } from "viem/ens";
 
 const publicClient = createPublicClient({
   chain: mainnet,
-  transport: http(),
+  transport: http(
+    process.env.NEXT_PUBLIC_ALCHEMY_ID
+      ? `https://eth-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
+      : undefined,
+  ),
 });
 
 /**

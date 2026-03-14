@@ -54,7 +54,18 @@ export default function RootLayout({
         <Web3Provider>
           {children}
         </Web3Provider>
-        <Toaster />
+        <Toaster
+          toastOptions={{
+            style: {
+              background: 'var(--c2)',
+              color: 'var(--c12)',
+              border: '1px solid var(--c3)',
+              borderRadius: '0',
+              fontFamily: 'var(--font-geist-mono)',
+              fontSize: '13px',
+            },
+          }}
+        />
       </body>
     </html>
   );

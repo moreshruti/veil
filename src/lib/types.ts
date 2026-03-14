@@ -28,6 +28,6 @@ export type ChatMessage = {
     transaction?: TransactionPreview;
     status?: "pending" | "approved" | "executed" | "failed";
     txHash?: string;
-    fileversDocId?: string;
+    fileverseDocId?: string;
   };
 };

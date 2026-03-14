@@ -317,7 +317,7 @@ export default function ChatPage() {
                 ...msg.metadata,
                 status: "executed" as const,
                 txHash,
-                fileversDocId: docId,
+                fileverseDocId: docId,
               },
             };
           });

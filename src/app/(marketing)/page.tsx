@@ -2,18 +2,16 @@
 
 import Link from "next/link";
 import {
-  Shield,
   MessageSquare,
   Lock,
   Wallet,
-  Eye,
   Zap,
   ArrowRight,
   ExternalLink,
   Fingerprint,
   FileText,
 } from "lucide-react";
-import { OrbitalLogo } from "@/components/ui/OrbitalLogo";
+import { MorphingIcon } from "@/components/ui/MorphingIcon";
 
 /* ------------------------------------------------------------------ */
 /*  Reusable primitives                                                */
@@ -50,11 +48,6 @@ export default function Home() {
         {/*  1. HERO                                                     */}
         {/* ============================================================ */}
         <section className="pt-44 pb-28 px-8">
-          {/* Orbital Logo */}
-          <div className="flex justify-center mb-12">
-            <OrbitalLogo />
-          </div>
-
           {/* Badge */}
           <div className="flex items-center gap-3 mb-10">
             <span className="h-px flex-1 max-w-12 border-t border-dashed border-c5" />
@@ -137,34 +130,27 @@ export default function Home() {
                   step: "01",
                   title: "Connect",
                   desc: "Sign in with your .eth name. No seed phrases. No gas.",
-                  icon: Wallet,
                 },
                 {
                   step: "02",
                   title: "Command",
                   desc: "Tell Veil what you need. Plain English. 'Swap 0.1 BTC privately.' ETH, USDC, cbBTC.",
-                  icon: MessageSquare,
                 },
                 {
                   step: "03",
                   title: "Review",
                   desc: "Veil proposes. You see the route, fees, policy check. One tap to approve.",
-                  icon: Eye,
                 },
                 {
                   step: "04",
                   title: "Execute",
                   desc: "Stealth address. No link to your wallet. Encrypted record. Only you.",
-                  icon: Shield,
                 },
               ].map((item) => (
                 <div key={item.step} className="bg-background p-6">
-                  <div className="flex items-center gap-2 mb-4">
-                    <span className="text-[10px] text-c5 font-mono tabular-nums">
-                      {item.step}
-                    </span>
-                    <item.icon size={14} className="text-c5" />
-                  </div>
+                  <span className="text-2xl text-c4 font-mono tabular-nums font-semibold mb-4 block">
+                    {item.step}
+                  </span>
                   <h3 className="text-sm font-mono font-medium text-c12 mb-2">
                     {item.title}
                   </h3>
@@ -221,9 +207,15 @@ export default function Home() {
                   title: "Gasless on Base",
                   desc: "Smart Wallet. Paymaster. No gas tokens. Just go.",
                 },
-              ].map((feature) => (
-                <div key={feature.title} className="bg-background p-6">
-                  <feature.icon size={16} className="text-c5 mb-4" />
+              ].map((feature, i) => (
+                <div key={feature.title} className="bg-background p-6 group">
+                  <div className="mb-5" style={{ animationDelay: `${i * 0.4}s` }}>
+                    <MorphingIcon
+                      icon={feature.icon}
+                      size={28}
+                      className="text-c7 group-hover:text-c10 transition-colors duration-300"
+                    />
+                  </div>
                   <h3 className="text-sm font-mono font-medium text-c12 mb-2">
                     {feature.title}
                   </h3>

@@ -302,7 +302,7 @@ type ChatMessage = {
     transaction?: TransactionPreview;
     policyCheck?: PolicyCheckResult;
     stealthAddress?: string;
-    fileversDocId?: string;
+    fileverseDocId?: string;
   };
 };
 ```
