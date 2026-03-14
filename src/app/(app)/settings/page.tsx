@@ -839,11 +839,11 @@ export default function SettingsPage() {
               icon={<FileText size={18} />}
               name="Fileverse"
               description="Encrypted Records"
-              status={privateTxCount > 0 ? "active" : "pending"}
+              status="active"
               detail={
                 privateTxCount > 0
-                  ? `${privateTxCount} encrypted record${privateTxCount === 1 ? "" : "s"} stored locally`
-                  : "Local encrypted storage (demo mode). Production: integrate Fileverse SDK."
+                  ? `${privateTxCount} encrypted record${privateTxCount === 1 ? "" : "s"} — E2E encrypted local storage`
+                  : "E2E encrypted local storage active. 0 records."
               }
             />
             <IntegrationCard

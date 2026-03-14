@@ -499,7 +499,6 @@ h6 {
     var(--c2) 5px
   );
   border-top: 1px solid var(--c3);
-  border-bottom: 1px solid var(--c3);
 }
 
 /* --------------------------------------------------------------------------
@@ -628,13 +627,14 @@ h6 {
 
 .btn-filled {
   background: var(--c12);
-  color: var(--c1);
+  color: var(--background);
   border-color: var(--c12);
 }
 
 .btn-filled:hover {
-  background: var(--c11);
-  border-color: var(--c11);
+  background: var(--c10);
+  color: var(--background);
+  border-color: var(--c10);
 }
 
 /* Input */

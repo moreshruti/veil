@@ -91,7 +91,7 @@ export default function Home() {
         {/*  2. STATS STRIP                                              */}
         {/* ============================================================ */}
         <section className="section flow-line">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-c2">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-c2 border-t border-b border-c3">
             {(
               [
                 ["100%", "of transactions publicly visible"],
@@ -120,46 +120,46 @@ export default function Home() {
         <section id="how-it-works" className="section flow-line">
           <div className="px-8 pt-10 pb-8">
             <SectionLabel>How It Works</SectionLabel>
-            <h2 className="text-2xl uppercase tracking-tight text-c11 mb-10">
+            <h2 className="text-2xl uppercase tracking-tight text-c11 mb-0">
               Four steps to private DeFi
             </h2>
+          </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-px bg-c2">
-              {[
-                {
-                  step: "01",
-                  title: "Connect",
-                  desc: "Sign in with your .eth name. No seed phrases. No gas.",
-                },
-                {
-                  step: "02",
-                  title: "Command",
-                  desc: "Tell Veil what you need. Plain English. 'Swap 0.1 BTC privately.' ETH, USDC, cbBTC.",
-                },
-                {
-                  step: "03",
-                  title: "Review",
-                  desc: "Veil proposes. You see the route, fees, policy check. One tap to approve.",
-                },
-                {
-                  step: "04",
-                  title: "Execute",
-                  desc: "Stealth address. No link to your wallet. Encrypted record. Only you.",
-                },
-              ].map((item) => (
-                <div key={item.step} className="bg-background p-6">
-                  <span className="text-2xl text-c4 font-mono tabular-nums font-semibold mb-4 block">
-                    {item.step}
-                  </span>
-                  <h3 className="text-sm font-mono font-medium text-c12 mb-2">
-                    {item.title}
-                  </h3>
-                  <p className="text-xs text-c7 font-mono leading-relaxed">
-                    {item.desc}
-                  </p>
-                </div>
-              ))}
-            </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-px bg-c2 border-t border-b border-c3">
+            {[
+              {
+                step: "01",
+                title: "Connect",
+                desc: "Sign in with your .eth name. No seed phrases. No gas.",
+              },
+              {
+                step: "02",
+                title: "Command",
+                desc: "Tell Veil what you need. Plain English. 'Swap 0.1 BTC privately.' ETH, USDC, cbBTC.",
+              },
+              {
+                step: "03",
+                title: "Review",
+                desc: "Veil proposes. You see the route, fees, policy check. One tap to approve.",
+              },
+              {
+                step: "04",
+                title: "Execute",
+                desc: "Stealth address. No link to your wallet. Encrypted record. Only you.",
+              },
+            ].map((item) => (
+              <div key={item.step} className="bg-background p-6">
+                <span className="text-2xl text-c4 font-mono tabular-nums font-semibold mb-4 block">
+                  {item.step}
+                </span>
+                <h3 className="text-sm font-mono font-medium text-c12 mb-2">
+                  {item.title}
+                </h3>
+                <p className="text-xs text-c7 font-mono leading-relaxed">
+                  {item.desc}
+                </p>
+              </div>
+            ))}
           </div>
         </section>
 
@@ -171,60 +171,60 @@ export default function Home() {
         <section id="features" className="section flow-line">
           <div className="px-8 pt-10 pb-8">
             <SectionLabel>Why Veil</SectionLabel>
-            <h2 className="text-2xl uppercase tracking-tight text-c11 mb-10">
+            <h2 className="text-2xl uppercase tracking-tight text-c11 mb-0">
               Privacy that doesn&apos;t need a manual
             </h2>
+          </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-px bg-c2">
-              {[
-                {
-                  icon: MessageSquare,
-                  title: "Natural Language DeFi",
-                  desc: "Swap ETH, USDC, or cbBTC. Say what you need. The AI handles the rest.",
-                },
-                {
-                  icon: Fingerprint,
-                  title: "Stealth Addresses",
-                  desc: "Every transaction. Fresh address. No link back.",
-                },
-                {
-                  icon: Lock,
-                  title: "Multi-Sig Security",
-                  desc: "AI proposes. You approve. BitGo policy engine enforces the rules.",
-                },
-                {
-                  icon: Wallet,
-                  title: "ENS Identity",
-                  desc: "Your agent gets a name. you.veil.eth. Human-readable. Verifiable.",
-                },
-                {
-                  icon: FileText,
-                  title: "Encrypted Records",
-                  desc: "Transaction history on Fileverse. E2E encrypted. No surveillance.",
-                },
-                {
-                  icon: Zap,
-                  title: "Gasless on Base",
-                  desc: "Smart Wallet. Paymaster. No gas tokens. Just go.",
-                },
-              ].map((feature, i) => (
-                <div key={feature.title} className="bg-background p-6 group">
-                  <div className="mb-5" style={{ animationDelay: `${i * 0.4}s` }}>
-                    <MorphingIcon
-                      icon={feature.icon}
-                      size={28}
-                      className="text-c7 group-hover:text-c10 transition-colors duration-300"
-                    />
-                  </div>
-                  <h3 className="text-sm font-mono font-medium text-c12 mb-2">
-                    {feature.title}
-                  </h3>
-                  <p className="text-xs text-c7 font-mono leading-relaxed">
-                    {feature.desc}
-                  </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-px bg-c2 border-t border-b border-c3">
+            {[
+              {
+                icon: MessageSquare,
+                title: "Natural Language DeFi",
+                desc: "Swap ETH, USDC, or cbBTC. Say what you need. The AI handles the rest.",
+              },
+              {
+                icon: Fingerprint,
+                title: "Stealth Addresses",
+                desc: "Every transaction. Fresh address. No link back.",
+              },
+              {
+                icon: Lock,
+                title: "Multi-Sig Security",
+                desc: "AI proposes. You approve. BitGo policy engine enforces the rules.",
+              },
+              {
+                icon: Wallet,
+                title: "ENS Identity",
+                desc: "Your agent gets a name. you.veil.eth. Human-readable. Verifiable.",
+              },
+              {
+                icon: FileText,
+                title: "Encrypted Records",
+                desc: "Transaction history on Fileverse. E2E encrypted. No surveillance.",
+              },
+              {
+                icon: Zap,
+                title: "Gasless on Base",
+                desc: "Smart Wallet. Paymaster. No gas tokens. Just go.",
+              },
+            ].map((feature, i) => (
+              <div key={feature.title} className="bg-background p-6 group">
+                <div className="mb-5" style={{ animationDelay: `${i * 0.4}s` }}>
+                  <MorphingIcon
+                    icon={feature.icon}
+                    size={28}
+                    className="text-c7 group-hover:text-c10 transition-colors duration-300"
+                  />
                 </div>
-              ))}
-            </div>
+                <h3 className="text-sm font-mono font-medium text-c12 mb-2">
+                  {feature.title}
+                </h3>
+                <p className="text-xs text-c7 font-mono leading-relaxed">
+                  {feature.desc}
+                </p>
+              </div>
+            ))}
           </div>
         </section>
 
@@ -236,74 +236,30 @@ export default function Home() {
         <section id="architecture" className="section flow-line">
           <div className="px-8 pt-10 pb-8">
             <SectionLabel>Protocol Stack</SectionLabel>
-            <h2 className="text-2xl uppercase tracking-tight text-c11 mb-10">
+            <h2 className="text-2xl uppercase tracking-tight text-c11 mb-0">
               Six layers. One conversation.
             </h2>
+          </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-[1fr_1fr] gap-8">
-              {/* ASCII-style stacked diagram */}
-              <div className="font-mono text-xs leading-loose">
-                {[
-                  { layer: "Chat Interface", tech: "Next.js + OnchainKit" },
-                  { layer: "AI Intent Engine", tech: "HeyElsa x402" },
-                  { layer: "Identity Layer", tech: "ENS" },
-                  { layer: "Policy Engine", tech: "BitGo Multi-Sig" },
-                  { layer: "Execution Layer", tech: "Base L2" },
-                  { layer: "Private Records", tech: "Fileverse dDocs" },
-                ].map((row, i) => (
-                  <div key={row.layer} className="border border-border -mt-px">
-                    <div className="flex items-center justify-between px-4 py-3">
-                      <div className="flex items-center gap-3">
-                        <span className="text-c5 tabular-nums w-4">
-                          {String(i + 1).padStart(2, "0")}
-                        </span>
-                        <span className="text-c11">{row.layer}</span>
-                      </div>
-                      <span className="text-c5">{row.tech}</span>
-                    </div>
-                  </div>
-                ))}
+          <div className="border-t border-c3 font-mono text-xs">
+            {[
+              { layer: "Chat Interface", tech: "Next.js + OnchainKit", desc: "Natural language in, structured intent out. No forms. No dropdowns." },
+              { layer: "AI Intent Engine", tech: "HeyElsa x402", desc: "Parses your request. Finds the optimal route. Respects your constraints." },
+              { layer: "Identity Layer", tech: "ENS", desc: "Resolves who you are. Subnames give your agent a human-readable handle." },
+              { layer: "Policy Engine", tech: "BitGo Multi-Sig", desc: "Spending limits. Whitelist enforcement. AI cannot go rogue." },
+              { layer: "Execution Layer", tech: "Base L2", desc: "Fast. Cheap. Stealth addresses mask the destination." },
+              { layer: "Private Records", tech: "Fileverse dDocs", desc: "E2E encrypted history. Only your keys unlock it." },
+            ].map((row, i) => (
+              <div key={row.layer} className="border-b border-c3 grid grid-cols-[auto_1fr_1fr_1fr] md:grid-cols-[3rem_1fr_1fr_1.5fr] items-stretch">
+                <span className="text-c4 tabular-nums px-4 py-4 text-sm font-semibold border-r border-c3 flex items-center">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <span className="text-c11 py-4 px-4 border-r border-c3 flex items-center">{row.layer}</span>
+                <span className="text-c5 py-4 px-4 border-r border-c3 hidden md:flex items-center">{row.tech}</span>
+                <span className="text-c5 py-4 px-4 md:hidden flex items-center">{row.tech}</span>
+                <span className="text-c6 py-4 px-4 hidden md:flex items-center">{row.desc}</span>
               </div>
-
-              {/* Layer descriptions */}
-              <div className="space-y-6">
-                {[
-                  {
-                    title: "Chat Interface",
-                    desc: "You type. Natural language in, structured intent out. No forms. No dropdowns.",
-                  },
-                  {
-                    title: "AI Intent Engine",
-                    desc: "Parses your request. Finds the optimal route. Respects your constraints.",
-                  },
-                  {
-                    title: "Identity Layer",
-                    desc: "ENS resolves who you are. Subnames give your agent a human-readable handle.",
-                  },
-                  {
-                    title: "Policy Engine",
-                    desc: "Multi-sig guardrails. Spending limits. Whitelist enforcement. AI cannot go rogue.",
-                  },
-                  {
-                    title: "Execution Layer",
-                    desc: "Base L2. Fast. Cheap. Stealth addresses mask the destination.",
-                  },
-                  {
-                    title: "Private Records",
-                    desc: "Fileverse stores your history. E2E encrypted. Only your keys unlock it.",
-                  },
-                ].map((item) => (
-                  <div key={item.title}>
-                    <h4 className="text-xs font-mono font-medium text-c9 mb-1">
-                      {item.title}
-                    </h4>
-                    <p className="text-xs font-mono text-c7 leading-relaxed">
-                      {item.desc}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </div>
+            ))}
           </div>
         </section>
 
@@ -315,43 +271,43 @@ export default function Home() {
         <section className="section flow-line">
           <div className="px-8 pt-10 pb-8">
             <SectionLabel>Built With</SectionLabel>
-            <h2 className="text-2xl uppercase tracking-tight text-c11 mb-10">
+            <h2 className="text-2xl uppercase tracking-tight text-c11 mb-0">
               Built with the best
             </h2>
+          </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-px bg-c2">
-              {[
-                {
-                  name: "ENS",
-                  desc: "Identity. Subnames. Human-readable addresses.",
-                },
-                {
-                  name: "BitGo",
-                  desc: "Multi-sig. Policy engine. Institutional custody.",
-                },
-                {
-                  name: "HeyElsa",
-                  desc: "AI intent parsing. x402 protocol. Natural language DeFi.",
-                },
-                {
-                  name: "Fileverse",
-                  desc: "E2E encrypted docs. On-chain storage. Private records.",
-                },
-                {
-                  name: "Base",
-                  desc: "L2 execution. Paymaster. Gasless transactions.",
-                },
-              ].map((sponsor) => (
-                <div key={sponsor.name} className="bg-background p-5">
-                  <h3 className="text-sm font-mono font-medium text-c12 mb-1.5">
-                    {sponsor.name}
-                  </h3>
-                  <p className="text-[11px] text-c7 font-mono leading-relaxed">
-                    {sponsor.desc}
-                  </p>
-                </div>
-              ))}
-            </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-px bg-c2 border-t border-b border-c3">
+            {[
+              {
+                name: "ENS",
+                desc: "Identity. Subnames. Human-readable addresses.",
+              },
+              {
+                name: "BitGo",
+                desc: "Multi-sig. Policy engine. Institutional custody.",
+              },
+              {
+                name: "HeyElsa",
+                desc: "AI intent parsing. x402 protocol. Natural language DeFi.",
+              },
+              {
+                name: "Fileverse",
+                desc: "E2E encrypted docs. On-chain storage. Private records.",
+              },
+              {
+                name: "Base",
+                desc: "L2 execution. Paymaster. Gasless transactions.",
+              },
+            ].map((sponsor) => (
+              <div key={sponsor.name} className="bg-background p-5">
+                <h3 className="text-sm font-mono font-medium text-c12 mb-1.5">
+                  {sponsor.name}
+                </h3>
+                <p className="text-[11px] text-c7 font-mono leading-relaxed">
+                  {sponsor.desc}
+                </p>
+              </div>
+            ))}
           </div>
         </section>
 
@@ -360,7 +316,7 @@ export default function Home() {
         {/* ============================================================ */}
         {/*  7. CTA                                                      */}
         {/* ============================================================ */}
-        <section className="section flow-line">
+        <section className="section flow-line border-t border-b border-c3">
           <div className="px-8 pt-20 pb-20 text-center">
             <h2 className="text-2xl sm:text-3xl uppercase tracking-tight text-c12 mb-4">
               Privacy shouldn&apos;t require a PhD

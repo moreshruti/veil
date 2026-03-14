@@ -47,11 +47,14 @@ export default function AppLayout({
       <aside
         className={clsx(
           "shrink-0 flex flex-col border-r border-c3 bg-c1 transition-all duration-200 overflow-hidden",
-          collapsed ? "w-14" : "w-60"
+          collapsed ? "w-16" : "w-60"
         )}
       >
         {/* Logo + Collapse toggle */}
-        <div className="flex items-center justify-between h-14 px-4 border-b border-c3">
+        <div className={clsx(
+          "flex items-center h-14 border-b border-c3",
+          collapsed ? "justify-center" : "justify-between px-4"
+        )}>
           {!collapsed && (
             <span className="font-semibold text-c12 font-mono text-base tracking-tight">
               Veil
@@ -60,10 +63,10 @@ export default function AppLayout({
           <button
             type="button"
             onClick={() => setCollapsed((p) => !p)}
-            className="text-c5 hover:text-c12 transition-colors cursor-pointer"
+            className="text-c5 hover:text-c12 transition-colors cursor-pointer p-1"
             aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
           >
-            {collapsed ? <PanelLeft size={18} /> : <PanelLeftClose size={18} />}
+            {collapsed ? <PanelLeft size={20} /> : <PanelLeftClose size={20} />}
           </button>
         </div>
 
@@ -72,13 +75,13 @@ export default function AppLayout({
           <Link
             href="/chat"
             className={clsx(
-              "flex items-center gap-2 px-3 py-2",
+              "flex items-center gap-2 py-2.5",
               "bg-c2 border border-c3 text-c9 font-mono text-xs",
               "hover:border-c4 hover:text-c12 transition-colors",
-              collapsed && "justify-center px-0"
+              collapsed ? "justify-center px-2.5" : "px-3"
             )}
           >
-            <Plus size={14} />
+            <Plus size={18} />
             {!collapsed && <span>New Chat</span>}
           </Link>
         </div>
@@ -103,13 +106,13 @@ export default function AppLayout({
               key={item.href}
               href={item.href}
               className={clsx(
-                "flex items-center gap-2.5 px-3 py-2",
+                "flex items-center gap-2.5 py-2.5",
                 "text-sm font-mono text-c7",
                 "hover:text-c12 hover:bg-c2 transition-colors",
-                collapsed && "justify-center px-0"
+                collapsed ? "justify-center px-0" : "px-3"
               )}
             >
-              <item.icon size={16} />
+              <item.icon size={20} />
               {!collapsed && <span>{item.label}</span>}
             </Link>
           ))}
@@ -120,13 +123,13 @@ export default function AppLayout({
           <Link
             href="/"
             className={clsx(
-              "flex items-center gap-2 px-3 py-2",
+              "flex items-center gap-2 py-2",
               "text-xs font-mono text-c5",
               "hover:text-c12 transition-colors",
-              collapsed && "justify-center px-0"
+              collapsed ? "justify-center px-0" : "px-3"
             )}
           >
-            <ArrowLeft size={14} />
+            <ArrowLeft size={18} />
             {!collapsed && <span>Back to Home</span>}
           </Link>
         </div>

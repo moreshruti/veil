@@ -2,10 +2,10 @@
 
 import { useEffect, useRef } from "react";
 import clsx from "clsx";
-import { MessageSquare } from "lucide-react";
 import type { ChatMessage } from "@/lib/types";
 import { ChatMessageBubble } from "./ChatMessage";
 import { TypingIndicator } from "./TypingIndicator";
+import { StealthIllustration } from "@/components/ui/StealthIllustration";
 
 interface ChatWindowProps {
   messages: ChatMessage[];
@@ -45,24 +45,29 @@ export function ChatWindow({
       className="flex-1 overflow-y-auto px-4 py-6"
     >
       {isEmpty ? (
-        <div className="flex flex-col items-center justify-center h-full gap-6 text-center">
-          <div className="flex flex-col items-center gap-3">
-            <MessageSquare size={32} className="text-c4" strokeWidth={1} />
-            <p className="text-sm font-mono text-c5 max-w-xs leading-relaxed">
+        <div className="flex flex-col items-center justify-center h-full gap-8 text-center">
+          <StealthIllustration size={220} />
+
+          <div className="flex flex-col items-center gap-2">
+            <p className="text-sm font-mono text-c7 max-w-xs leading-relaxed">
               Start a conversation. Tell Veil what you need.
             </p>
+            <p className="text-[11px] font-mono text-c4">
+              Private swaps, stealth transfers, portfolio checks.
+            </p>
           </div>
-          <div className="flex flex-wrap items-center justify-center gap-2">
+
+          <div className="flex flex-wrap items-center justify-center gap-2 max-w-md">
             {EXAMPLE_PROMPTS.map((prompt) => (
               <button
                 key={prompt}
                 type="button"
                 onClick={() => onPromptClick?.(prompt)}
                 className={clsx(
-                  "px-3 py-1.5 text-xs font-mono text-c9",
+                  "px-3 py-2 text-xs font-mono text-c7",
                   "bg-c2 border border-c3",
-                  "hover:border-c4 hover:text-c12",
-                  "transition-colors duration-150",
+                  "hover:border-c5 hover:text-c12 hover:bg-c3/50",
+                  "transition-all duration-200",
                   "cursor-pointer"
                 )}
               >
