@@ -157,7 +157,9 @@ export async function POST(request: NextRequest) {
 
   // Dev mode: return mock when env vars are not configured
   if (!endpoint || !apiKey) {
-    return mockResponse(body);
+    const res = mockResponse(body);
+    res.headers.set("X-Veil-Source", "mock");
+    return res;
   }
 
   try {
@@ -169,14 +171,23 @@ export async function POST(request: NextRequest) {
     });
 
     if (!res.ok) {
-      console.error(`[x402] Upstream returned ${res.status}`);
-      return mockResponse(body);
+      const errorText = await res.text().catch(() => "Unknown error");
+      console.error(`[x402] Upstream returned ${res.status}: ${errorText}`);
+      return NextResponse.json(
+        { error: "Upstream service error", status: res.status, detail: errorText },
+        { status: 502, headers: { "X-Veil-Source": "live" } },
+      );
     }
 
     const data = await res.json();
-    return NextResponse.json(data);
+    return NextResponse.json(data, {
+      headers: { "X-Veil-Source": "live" },
+    });
   } catch (error) {
     console.error("[x402] Upstream request failed:", error);
-    return mockResponse(body);
+    return NextResponse.json(
+      { error: "Upstream request failed", detail: String(error) },
+      { status: 502, headers: { "X-Veil-Source": "live" } },
+    );
   }
 }

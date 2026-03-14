@@ -124,7 +124,9 @@ export async function POST(request: NextRequest) {
 
   // Dev mode: return mock when token is not configured
   if (!accessToken) {
-    return mockResponse(body);
+    const res = mockResponse(body);
+    res.headers.set("X-Veil-Source", "mock");
+    return res;
   }
 
   // Map actions to BitGo API endpoints
@@ -163,14 +165,23 @@ export async function POST(request: NextRequest) {
     });
 
     if (!res.ok) {
-      console.error(`[bitgo] Upstream returned ${res.status}`);
-      return mockResponse(body);
+      const errorText = await res.text().catch(() => "Unknown error");
+      console.error(`[bitgo] Upstream returned ${res.status}: ${errorText}`);
+      return NextResponse.json(
+        { error: "Upstream service error", status: res.status, detail: errorText },
+        { status: 502, headers: { "X-Veil-Source": "live" } },
+      );
     }
 
     const data = await res.json();
-    return NextResponse.json(data);
+    return NextResponse.json(data, {
+      headers: { "X-Veil-Source": "live" },
+    });
   } catch (err) {
     console.error("[bitgo] Upstream request failed:", err);
-    return mockResponse(body);
+    return NextResponse.json(
+      { error: "Upstream request failed", detail: String(err) },
+      { status: 502, headers: { "X-Veil-Source": "live" } },
+    );
   }
 }

@@ -19,9 +19,21 @@ export const config = createConfig(
   getDefaultConfig({
     chains: [base, baseSepolia, mainnet],
     transports: {
-      [base.id]: http(),
-      [baseSepolia.id]: http(),
-      [mainnet.id]: http(),
+      [base.id]: http(
+        process.env.NEXT_PUBLIC_ALCHEMY_ID
+          ? `https://base-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
+          : undefined,
+      ),
+      [baseSepolia.id]: http(
+        process.env.NEXT_PUBLIC_ALCHEMY_ID
+          ? `https://base-sepolia.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
+          : undefined,
+      ),
+      [mainnet.id]: http(
+        process.env.NEXT_PUBLIC_ALCHEMY_ID
+          ? `https://eth-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
+          : undefined,
+      ),
     },
     walletConnectProjectId:
       process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID ?? "",

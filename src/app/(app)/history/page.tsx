@@ -47,7 +47,7 @@ function toHistoryTransaction(record: TransactionRecord): HistoryTransaction {
     fullStealthAddress: record.stealthAddress,
     txHash: record.txHash,
     status: record.status,
-    fileversDocId: `doc_${record.id}`,
+    fileverseDocId: `doc_${record.id}`,
     policyCheckPassed: record.status !== "failed",
   };
 }

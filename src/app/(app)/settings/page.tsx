@@ -843,7 +843,7 @@ export default function SettingsPage() {
               detail={
                 privateTxCount > 0
                   ? `${privateTxCount} encrypted record${privateTxCount === 1 ? "" : "s"} stored locally`
-                  : "Mock Mode — No records stored yet. Configure FILEVERSE_API_KEY in .env for live storage."
+                  : "Local encrypted storage (demo mode). Production: integrate Fileverse SDK."
               }
             />
             <IntegrationCard

@@ -28,7 +28,7 @@ export interface HistoryTransaction {
   fullStealthAddress: string;
   txHash: string;
   status: TransactionStatus;
-  fileversDocId: string;
+  fileverseDocId: string;
   policyCheckPassed: boolean;
 }
 
@@ -211,12 +211,12 @@ export function HistoryItem({ transaction }: HistoryItemProps) {
           <div className="flex items-center justify-between text-xs">
             <span className="text-c5">Fileverse Record</span>
             <a
-              href={`https://portal.fileverse.io/#/doc/${transaction.fileversDocId}`}
+              href={`https://portal.fileverse.io/#/doc/${transaction.fileverseDocId}`}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-1 text-accent hover:underline"
             >
-              <span>{transaction.fileversDocId}</span>
+              <span>{transaction.fileverseDocId}</span>
               <ExternalLink size={10} />
             </a>
           </div>
